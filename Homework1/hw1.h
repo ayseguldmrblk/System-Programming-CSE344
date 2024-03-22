@@ -65,43 +65,68 @@ void sortAll(const char *filename, SortBy sortBy, SortOrder sortOrder)
     StudentGrade grades[1000];
     ssize_t bytes_read;
     char buffer[1024];
-    // Open the file for reading and writing
-    int fd = open(filename, O_RDWR);
+    char *name;
+    char *surname;
+    char *grade;
+
+    // Open the file for reading
+    int fd = open(filename, O_RDONLY);
     if (fd == -1) 
     {
         perror("Error opening file");
         exit(EXIT_FAILURE);
     }
 
-    // Read all student grades from the file
     while ((bytes_read = read(fd, buffer, sizeof(buffer))) > 0) 
     {
-        char *name = strtok(buffer, " ");
-        char *grade = strtok(NULL, "\n");
-        strcpy(grades[num_grades].name, name);
-        strcpy(grades[num_grades].grade, grade);
-        num_grades++;
+        char *ptr = buffer;
+        while ((name = strtok_r(ptr, " ", &ptr)) != NULL &&
+               (surname = strtok_r(NULL, " ", &ptr)) != NULL &&
+               (grade = strtok_r(NULL, "\n", &ptr)) != NULL) 
+        {
+            // Store name and grade
+            strcpy(grades[num_grades].name, name);
+            strcat(grades[num_grades].name, " ");
+            strcat(grades[num_grades].name, surname);
+            strcpy(grades[num_grades].grade, grade);
+
+            // Increment the number of grades
+            num_grades++;
+        }
+    }
+
+    if (bytes_read == -1) 
+    {
+        perror("Error reading from file");
+        exit(EXIT_FAILURE);
     }
 
     // Determine comparison function based on sort criteria
     int (*compareFunction)(const void *, const void *);
-    if (sortBy == BY_NAME) {
+    if (sortBy == BY_NAME) 
+    {
         compareFunction = (sortOrder == ASCENDING) ? compareByName : compareByNameDesc;
-    } else { // BY_GRADE
+    } else 
+    { // BY_GRADE
         compareFunction = (sortOrder == ASCENDING) ? compareByGrade : compareByGradeDesc;
     }
 
     // Sort the grades
     qsort(grades, num_grades, sizeof(StudentGrade), compareFunction);
 
-    // Write the sorted grades back to the file
-    lseek(fd, 0, SEEK_SET);
-    for (size_t i = 0; i < num_grades; i++) {
-        dprintf(fd, "%s %s\n", grades[i].name, grades[i].grade);
+    // Print sorted grades for debugging
+    write(STDOUT_FILENO, "Sorted grades:\n", strlen("Sorted grades:\n"));
+    for (size_t i = 0; i < num_grades; i++) 
+    {
+        write(STDOUT_FILENO, grades[i].name, strlen(grades[i].name));
+        write(STDOUT_FILENO, " ", 1);
+        write(STDOUT_FILENO, grades[i].grade, strlen(grades[i].grade));
+        write(STDOUT_FILENO, "\n", 1);
     }
 
     // Close the file
-    if (close(fd) == -1) {
+    if (close(fd) == -1) 
+    {
         perror("Error closing file");
         exit(EXIT_FAILURE);
     }
@@ -483,6 +508,7 @@ void executeCommand(const char *command)
                 sortOrder = ASCENDING;
                 break;
         }
+        printf("Sorting by %s in %s order...\n", sortBy == BY_NAME ? "name" : "grade", sortOrder == ASCENDING ? "ascending" : "descending");
         sortAll(filename, sortBy, sortOrder);
     } else if (strcmp(token, "showAll") == 0) 
     {
