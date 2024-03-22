@@ -359,38 +359,78 @@ void displayFirst5(const char *filename)
 
 void displayPage(const char *filename, int numOfEntries, int pageNumber) 
 {
+    int fd, lines_read = 0, offset = 0;
     ssize_t bytes_read;
     char buffer[1024];
-    // Calculate the starting position in the file based on page number and number of entries per page
-    off_t offset = (pageNumber - 1) * numOfEntries * sizeof(buffer);
 
-    // Open the file for reading
-    int fd = open(filename, O_RDONLY);
+    // Open the file in read-only mode
+    fd = open(filename, O_RDONLY);
     if (fd == -1) 
     {
         perror("Error opening file");
         exit(EXIT_FAILURE);
     }
 
-    // Move the file pointer to the starting position
-    if (lseek(fd, offset, SEEK_SET) == -1) 
-    {
-        perror("Error seeking file");
-        exit(EXIT_FAILURE);
-    }
-
-    // Read and display the specified number of entries for the given page
-    for (int i = 0; i < numOfEntries; i++) 
+    // Calculate the offset based on the number of newline characters
+    while (lines_read < (pageNumber - 1) * numOfEntries) 
     {
         bytes_read = read(fd, buffer, sizeof(buffer));
-        if (bytes_read <= 0) 
+        if (bytes_read == -1) 
         {
-            break; // End of file reached or error occurred
+            perror("Error reading from file");
+            exit(EXIT_FAILURE);
         }
-        write(STDOUT_FILENO, buffer, bytes_read);
+        if (bytes_read == 0) 
+        {
+            // Reached end of file before reaching the desired page
+            write(STDOUT_FILENO, "End of file reached.\n", strlen("End of file reached.\n"));
+            if(close(fd) == -1)
+            {
+                perror("Error closing file");
+                exit(EXIT_FAILURE);
+            }
+            return;
+        }
+        for (int i = 0; i < bytes_read; i++) 
+        {
+            if (buffer[i] == '\n') 
+            {
+                lines_read++;
+            }
+            if (lines_read >= (pageNumber - 1) * numOfEntries) 
+            {
+                offset += i + 1;
+                break;
+            }
+        }
     }
 
-    // Check for read error
+    // Seek to the starting line
+    lseek(fd, offset, SEEK_SET);
+
+    // Read and display lines until the desired number of lines are displayed or the end of file is reached
+    while ((bytes_read = read(fd, buffer, sizeof(buffer))) > 0) 
+    {
+        // Output the read buffer
+        for (int i = 0; i < bytes_read; i++) 
+        {
+            if (buffer[i] == '\n') 
+            {
+                lines_read++;
+            }
+            if (lines_read >= pageNumber * numOfEntries) 
+            {
+                break;
+            }
+            write(STDOUT_FILENO, &buffer[i], 1);
+        }
+        if (lines_read >= pageNumber * numOfEntries) 
+        {
+            break;
+        }
+    }
+
+    // Check for errors or end of file
     if (bytes_read == -1) 
     {
         perror("Error reading from file");
