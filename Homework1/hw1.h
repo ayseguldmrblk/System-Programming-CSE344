@@ -314,6 +314,7 @@ void displayFirst5(const char *filename)
 {
     ssize_t bytes_read;
     char buffer[1024];
+    int lines_read = 0; // Counter for lines read
     // Open the file for reading
     int fd = open(filename, O_RDONLY);
     if (fd == -1) 
@@ -323,21 +324,29 @@ void displayFirst5(const char *filename)
     }
 
     // Read and display the first 5 student grades from the file
-    for (int i = 0; i < 5; i++) 
+    while (lines_read < 5) // Loop until 5 lines are read
     {
         bytes_read = read(fd, buffer, sizeof(buffer));
         if (bytes_read <= 0) 
         {
             break; // End of file reached or error occurred
         }
+        // Count lines in the buffer
+        for (int i = 0; i < bytes_read; i++) 
+        {
+            if (buffer[i] == '\n') 
+            {
+                lines_read++;
+                if (lines_read >= 5) 
+                {
+                    // If 5 lines are read, exit the loop
+                    bytes_read = i + 1; // Adjust bytes_read to stop reading
+                    break;
+                }
+            }
+        }
+        // Write buffer content to stdout
         write(STDOUT_FILENO, buffer, bytes_read);
-    }
-
-    // Check for read error
-    if (bytes_read == -1) 
-    {
-        perror("Error reading from file");
-        exit(EXIT_FAILURE);
     }
 
     // Close the file
