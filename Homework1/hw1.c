@@ -24,6 +24,7 @@ int main()
         // Exit condition
         if (strcmp(command, "exit") == 0) 
         {
+            writeToLog(command);
             free(command);
             break;
         }
