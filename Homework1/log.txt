@@ -1,0 +1,77 @@
+Parent process (PID: 82957) waited for child process (PID: 83002) with exit status: 0
+Command executed: gtuStudentGrades
+Parent process (PID: 82957) waited for child process (PID: 84372) with exit status: 0
+Command executed: gtuStudentGrades grades.txt
+Parent process (PID: 82957) waited for child process (PID: 85513) with exit status: 0
+Command executed: addStudentGrade Ayse Gul AA
+Parent process (PID: 82957) waited for child process (PID: 85676) with exit status: 0
+Command executed: addStudentGrade Sevgi Oz CC
+Parent process (PID: 82957) waited for child process (PID: 85770) with exit status: 0
+Command executed: addStudentGrade Merve Erik DC
+Parent process (PID: 82957) waited for child process (PID: 85858) with exit status: 0
+Command executed: addStudentGrade Selo Can BA
+Parent process (PID: 82957) waited for child process (PID: 85937) with exit status: 0
+Command executed: addStudentGrade Ahmet Dertli FF
+Parent process (PID: 82957) waited for child process (PID: 86051) with exit status: 0
+Command executed: addStudentGrade Sezen Aksu CB
+Parent process (PID: 82957) waited for child process (PID: 86181) with exit status: 0
+Command executed: addstudentgrade Hülya Gok BB
+Parent process (PID: 82957) waited for child process (PID: 89454) with exit status: 0
+Command executed: searchStudent Ayse Gul
+Parent process (PID: 82957) waited for child process (PID: 89515) with exit status: 0
+Command executed: searchStudent Selo Can
+Parent process (PID: 82957) waited for child process (PID: 89581) with exit status: 0
+Command executed: searchStudent Hülya Gok
+Parent process (PID: 82957) waited for child process (PID: 89778) with exit status: 0
+Command executed: searchStudent Sezen Aksu
+Parent process (PID: 82957) waited for child process (PID: 89847) with exit status: 0
+Command executed: searchStudent Ahmet Dertli
+Parent process (PID: 82957) waited for child process (PID: 89950) with exit status: 0
+Command executed: searchStudentGrade Merve Erik
+Parent process (PID: 82957) waited for child process (PID: 90057) with exit status: 0
+Command executed: searchStudent Merve Erik
+Parent process (PID: 82957) waited for child process (PID: 91220) with exit status: 0
+Command executed: sortAll grades.txt
+Parent process (PID: 82957) waited for child process (PID: 91308) with exit status: 0
+Command executed: sortAll grades.txt
+Parent process (PID: 82957) waited for child process (PID: 91414) with exit status: 0
+Command executed: sortAll grades.txt
+Parent process (PID: 82957) waited for child process (PID: 91555) with exit status: 0
+Command executed: sortAll grades.txt
+Parent process (PID: 82957) waited for child process (PID: 92720) with exit status: 0
+Command executed: showAll grades.txt
+Parent process (PID: 82957) waited for child process (PID: 93563) with exit status: 0
+Command executed: addStudentGrade Apo Deli FF
+Parent process (PID: 82957) waited for child process (PID: 93642) with exit status: 0
+Command executed: addStudentGrade Senem Ak DD
+Parent process (PID: 82957) waited for child process (PID: 93774) with exit status: 0
+Command executed: addStudentGrade Murat Kul DC
+Parent process (PID: 82957) waited for child process (PID: 93918) with exit status: 0
+Command executed: addStudentGrade Cetin Ceviz BA
+Parent process (PID: 82957) waited for child process (PID: 94027) with exit status: 0
+Command executed: listGrades grades.txt
+Parent process (PID: 82957) waited for child process (PID: 95803) with exit status: 0
+Command executed: listSome 5 2 grades.txt
+Parent process (PID: 82957) waited for child process (PID: 95927) with exit status: 0
+Command executed: 
+Parent process (PID: 82957) waited for child process (PID: 96017) with exit status: 0
+Command executed: listSome 3 2 grades.txt
+Parent process (PID: 82957) waited for child process (PID: 96024) with exit status: 0
+Command executed: 
+Parent process (PID: 82957) waited for child process (PID: 96093) with exit status: 0
+Command executed: listSome 5 1 grades.txt
+Parent process (PID: 82957) waited for child process (PID: 96108) with exit status: 0
+Command executed: 
+Parent process (PID: 82957) waited for child process (PID: 96343) with exit status: 0
+Command executed: listSome 3 3 grades.txt
+Parent process (PID: 82957) waited for child process (PID: 96375) with exit status: 0
+Command executed: 
+Parent process (PID: 82957) waited for child process (PID: 96515) with exit status: 0
+Command executed: listSome 10 1 grades.txt
+Parent process (PID: 82957) waited for child process (PID: 96547) with exit status: 0
+Command executed: 
+Parent process (PID: 82957) waited for child process (PID: 96724) with exit status: 0
+Command executed: listSome 4 3 grades.txt
+Parent process (PID: 82957) waited for child process (PID: 96832) with exit status: 0
+Command executed: listSome 10 10 grades.txt
+exit
