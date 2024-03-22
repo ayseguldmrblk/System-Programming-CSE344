@@ -1,0 +1,14 @@
+Parent process (PID: 50740) waited for child process (PID: 51219) with exit status: 0
+Command executed: gtuStudentGrades grades.txt
+Parent process (PID: 50740) waited for child process (PID: 51624) with exit status: 0
+Command executed: addStudentGrade Ayse Gul AA
+Parent process (PID: 50740) waited for child process (PID: 52124) with exit status: 0
+Command executed: addStudentGrade Emre Guven CC
+Parent process (PID: 50740) waited for child process (PID: 52393) with exit status: 0
+Command executed: searchStudent Ayse Gul
+Parent process (PID: 50740) waited for child process (PID: 52802) with exit status: 0
+Command executed: searchStudent Emre Guven
+Parent process (PID: 50740) waited for child process (PID: 53464) with exit status: 0
+Command executed: addStudentGrade Berru Lafci BA
+Parent process (PID: 50740) waited for child process (PID: 53806) with exit status: 0
+Command executed: searchStudent Berru Lafci
