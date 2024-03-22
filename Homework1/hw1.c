@@ -22,7 +22,8 @@ int main()
         command = readLine();
 
         // Exit condition
-        if (strcmp(command, "exit") == 0) {
+        if (strcmp(command, "exit") == 0) 
+        {
             free(command);
             break;
         }

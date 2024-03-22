@@ -224,13 +224,15 @@ void searchStudent(const char *name)
             strcat(student_fullname, student_surname);
             // Skip to the next token, which should be the grade
             char *student_grade = strtok(NULL, " ");
-
-            int cmp_result = strcmp(student_fullname, name);
             
             // Check if the student name matches the provided name
             if (strcmp(student_fullname, name) == 0) 
             {
                 found = 1;
+                write(STDOUT_FILENO, student_fullname, strlen(student_fullname));
+                write(STDOUT_FILENO, " ", 1);
+                write(STDOUT_FILENO, student_grade, strlen(student_grade));
+                write(STDOUT_FILENO, "\n", 1);
                 break;  // Exit the loop once a match is found
             }
             // Move to the next line
@@ -436,14 +438,51 @@ void executeCommand(const char *command)
         // Concatenate name and surname
         char full_name[256]; // Assuming maximum length of name and surname is 255 characters
         snprintf(full_name, sizeof(full_name), "%s %s", name, surname);
-        printf("Full Name: %s\n", full_name); // Print the full name
         searchStudent(full_name); // Send the full name to the searchStudent function
     } else if (strcmp(token, "sortAll") == 0) 
     {
-        // Handle sortAll command
         char *filename = strtok(NULL, " ");
-        SortBy sortBy = BY_NAME; // Default to sorting by name
-        SortOrder sortOrder = ASCENDING; // Default to ascending order
+        int choice;
+        write(STDOUT_FILENO, "Enter 1 for sorting by name or 2 for sorting by grade: ", strlen("Enter 1 for sorting by name or 2 for sorting by grade: "));
+        char choiceStr[2];
+        read(STDIN_FILENO, choiceStr, sizeof(choiceStr));
+        choice = atoi(choiceStr);
+
+        SortBy sortBy;
+        switch (choice) 
+        {
+            case 1:
+                sortBy = BY_NAME;
+                break;
+            case 2:
+                sortBy = BY_GRADE;
+                break;
+            default:
+                write(STDOUT_FILENO, "Invalid choice. Defaulting to sorting by name.\n", strlen("Invalid choice. Defaulting to sorting by name.\n"));
+                sortBy = BY_NAME;
+                break;
+        }
+
+        int sortOrderChoice;
+        write(STDOUT_FILENO, "Enter 1 for ascending order or 2 for descending order: ", strlen("Enter 1 for ascending order or 2 for descending order: "));
+        char sortOrderChoiceStr[2];
+        read(STDIN_FILENO, sortOrderChoiceStr, sizeof(sortOrderChoiceStr));
+        sortOrderChoice = atoi(sortOrderChoiceStr);
+
+        SortOrder sortOrder;
+        switch (sortOrderChoice) 
+        {
+            case 1:
+                sortOrder = ASCENDING;
+                break;
+            case 2:
+                sortOrder = DESCENDING;
+                break;
+            default:
+                write(STDOUT_FILENO, "Invalid choice. Defaulting to ascending order.\n", strlen("Invalid choice. Defaulting to ascending order.\n"));
+                sortOrder = ASCENDING;
+                break;
+        }
         sortAll(filename, sortBy, sortOrder);
     } else if (strcmp(token, "showAll") == 0) 
     {
