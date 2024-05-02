@@ -13,6 +13,17 @@
 #define CLIENT_FIFO_TEMPLATE "/tmp/client_fifo.%ld"
 #define CLIENT_FIFO_NAME_LEN (sizeof(CLIENT_FIFO_TEMPLATE) + 20)
 
+typedef struct request_t
+{
+
+} request_t;
+
+typedef struct response_t
+{
+
+} response_t;
+
+
 int print(const char *message) 
 {
     size_t len = strlen(message);
@@ -50,6 +61,41 @@ void log_message(const char *message)
     }
 
     close(log_fd);
+}
+
+int connect_or_tryconnect(const char *str)
+{
+    if(str != NULL)
+    {
+        if(strcmp(str, "Connect") == 0)
+        {
+            return 0;
+        }
+        else if(strcmp(str, "tryConnect") == 0)
+        {
+            return 1;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    else 
+    {
+        return -1;
+    }
+}
+
+// Function to create client FIFO
+int create_client_fifo(const char *client_fifo) 
+{
+    if (mkfifo(client_fifo, 0666) == -1) 
+    {
+        fprintf(stderr, "Error creating client FIFO: %s (errno=%d)\n", strerror(errno), errno);
+        return -1;
+    }
+
+    return 0;
 }
 
 
