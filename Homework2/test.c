@@ -1,54 +1,148 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <signal.h>
+#include <unistd.h>
 #include <string.h>
+#include <signal.h>
+#include <sys/wait.h>
 #include <time.h>
-#include <errno.h>
 
-#define FIFO1 "fifo1"
-#define FIFO2 "fifo2"
-#define COMMAND "multiply"
+#define ARRAY_SIZE 2
 
-int child_count = 2; // Counter for the number of child processes spawned
+volatile sig_atomic_t child_exit_count = 0;
+
+int safe_print(const char *message) {
+    size_t len = strlen(message);
+    ssize_t bytes_written;
+
+    do {
+        bytes_written = write(STDOUT_FILENO, message, len);
+    } while (bytes_written == -1 && errno == EINTR);  // Retry if interrupted by signal
+
+    if (bytes_written == -1) {
+        perror("Error writing to STDOUT");
+        return -1;
+    }
+
+    return 0;  // Success
+}
 
 void sigchld_handler(int sig) {
-    printf("Signal handler invoked\n");
     int status;
     pid_t pid;
     while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
-        if (WIFEXITED(status)) {
-            printf("Child process %d exited with status: %d\n", pid, WEXITSTATUS(status));
-            if (child_count > 0) {
-                child_count--; // Decrement the child count only if it's greater than 0
-            }
+        safe_print("Signal handler invoked\n");
+        char message[100];
+        snprintf(message, sizeof(message), "Child process %d exited with status: %d\n", pid, WEXITSTATUS(status));
+        safe_print(message);
+        child_exit_count++;
+    }
+}
+
+void create_fifos() {
+    char *fifo1 = "fifo1";
+    char *fifo2 = "fifo2";
+
+    if (mkfifo(fifo1, 0666) < 0 || mkfifo(fifo2, 0666) < 0) {
+        perror("Failed to create FIFOs");
+        exit(EXIT_FAILURE);
+    }
+    safe_print("FIFOs created successfully.\n");
+}
+
+void generate_random_numbers(int numbers[]) {
+    srand(time(NULL));
+    for (int i = 0; i < ARRAY_SIZE; i++) {
+        numbers[i] = rand() % 100; // Generate random numbers
+    }
+}
+
+void write_to_fifo(int fd, int numbers[]) {
+    for (int i = 0; i < ARRAY_SIZE; i++) {
+        write(fd, &numbers[i], sizeof(int));
+    }
+}
+
+void parent_process(int fd1, int fd2, int numbers[], int total_children) {
+    safe_print("Parent Process: Writing array to FIFO1 and command to FIFO2...\n");
+    write_to_fifo(fd1, numbers);
+    write_to_fifo(fd2, numbers);
+    close(fd1);
+    sleep(1); // Ensure children have enough time to read from the FIFOs before proceeding
+    char command[] = "multiply\0";  // Ensure it's null-terminated
+    write(fd2, command, strlen(command) + 1);  // Use strlen + 1 to include the null terminator
+    close(fd2);
+    
+    while (1) {
+        if (child_exit_count >= total_children) {  // Check if all child processes have exited
+            safe_print("All child processes have exited.\n");
+            break; // Exit the loop if all child processes have exited
         }
     }
 }
 
-void print_exit_status(pid_t pid, const char *process_name) {
-    int status;
-    if (waitpid(pid, &status, 0) == -1) {
-        perror("waitpid");
+void child_process1() {
+    int fd1 = open("fifo1", O_RDONLY);
+    int num, sum = 0;
+    while (read(fd1, &num, sizeof(num)) > 0) {
+        sum += num;
+    }
+    char message[100];
+    snprintf(message, sizeof(message), "Child Process 1: Calculated sum: %d\n", sum);
+    safe_print(message);
+    close(fd1);
+
+    int fd2 = open("fifo2", O_WRONLY | O_APPEND );
+    if (fd2 == -1) {
+        perror("Failed to open FIFO2 for writing in Child Process 1");
         exit(EXIT_FAILURE);
     }
-    if (WIFEXITED(status)) {
-        printf("%s exit status: %d\n", process_name, WEXITSTATUS(status));
-    } else {
-        printf("%s did not exit normally\n", process_name);
-    }
+    write(fd2, &sum, sizeof(sum));
+    safe_print("Child Process 1: wrote to fifo2\n");
+    close(fd2);
+    exit(sum);
 }
 
-void print_proceeding_message(int duration) {
-    while (duration > 0) {
-        printf("Parent Process: Proceeding...\n");
-        sleep(2);
-        duration -= 2;
+void child_process2() {
+    sleep(10);  // Ensure Child Process 1 has time to write the sum
+    int fd2 = open("fifo2", O_RDONLY);
+    int numbers[ARRAY_SIZE];
+    int sum_from_child1;
+    char cmd_buffer[20] = {0};
+    int product = 1;
+
+    for (int i = 0; i < ARRAY_SIZE; i++) {
+        if (read(fd2, &numbers[i], sizeof(numbers[i])) > 0) {
+            product *= numbers[i];
+            safe_print("Child Process 2: multiplying\n");
+        }
     }
+
+    if (read(fd2, &sum_from_child1, sizeof(sum_from_child1)) > 0) {
+        char message[100];
+        snprintf(message, sizeof(message), "Child Process 2: Sum received: %d\n", sum_from_child1);
+        safe_print(message);
+    }
+
+    if (read(fd2, cmd_buffer, sizeof(cmd_buffer) - 1) > 0) {
+        char message[100];
+        snprintf(message, sizeof(message), "Child Process 2: Command received: %s\n", cmd_buffer);
+        safe_print(message);
+    }
+
+    if (strcmp(cmd_buffer, "multiply") == 0) {
+        int final_sum = product + sum_from_child1;  // Add the product to the sum received
+        char message[100];
+        snprintf(message, sizeof(message), "Child Process 2: Final sum after addition: %d\n", final_sum);
+        safe_print(message);
+    } else {
+        safe_print("Child Process 2: No valid command received.\n");
+    }
+
+    close(fd2);
+    exit(0);
 }
 
 int main(int argc, char *argv[]) {
@@ -57,132 +151,63 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    int n = atoi(argv[1]);
-    srand(time(NULL));
+    int input = atoi(argv[1]);
+    char message[100];
+    snprintf(message, sizeof(message), "Received integer: %d\n", input);
+    safe_print(message);
 
-    // Create FIFOs
-    if (mkfifo(FIFO1, 0666) == -1 || mkfifo(FIFO2, 0666) == -1) {
-        perror("Error creating FIFOs");
-        exit(EXIT_FAILURE);
+    struct sigaction sa;
+    sa.sa_handler = sigchld_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
+    sigaction(SIGCHLD, &sa, NULL);
+
+    create_fifos();
+
+    int numbers[ARRAY_SIZE];
+    generate_random_numbers(numbers);
+    safe_print("Array filled with random numbers:\n");
+    for (int i = 0; i < ARRAY_SIZE; i++) {
+        snprintf(message, sizeof(message), "%d ", numbers[i]);
+        safe_print(message);
     }
+    safe_print("\n");
 
-    // Set signal handler for SIGCHLD
-    signal(SIGCHLD, sigchld_handler);
-
-    // Fork first child process
     pid_t pid1 = fork();
-
-    if (pid1 == -1) {
-        perror("Fork failed");
-        exit(EXIT_FAILURE);
-    } else if (pid1 == 0) {
-        // Child process 1
-        sleep(10);
-        int fd1 = open(FIFO1, O_WRONLY);
-        if (fd1 == -1) {
-            perror("Error opening FIFO1");
-            exit(EXIT_FAILURE);
+    if (pid1 == 0) {  // Child Process 1
+        child_process1();
+    }
+    else 
+    {
+        while(child_exit_count < 1){
+            sleep(2);
+            safe_print("Parent Process: Preceding...\n");
         }
-
-        int numbers[n];
-        for (int i = 0; i < n; ++i) {
-            numbers[i] = rand() % 100; // Generate random numbers
-        }
-
-        if (write(fd1, numbers, sizeof(numbers)) == -1) {
-            perror("Error writing to FIFO1");
-            exit(EXIT_FAILURE);
-        }
-
-        close(fd1);
-        exit(EXIT_SUCCESS);
+        
     }
 
-    // Fork second child process
     pid_t pid2 = fork();
-
-    if (pid2 == -1) {
-        perror("Fork failed");
-        exit(EXIT_FAILURE);
-    } else if (pid2 == 0) {
-        // Child process 2
-        sleep(10);
-        int fd2 = open(FIFO2, O_WRONLY);
-        if (fd2 == -1) {
-            perror("Error opening FIFO2");
-            exit(EXIT_FAILURE);
+    if (pid2 == 0) {  // Child Process 2
+        child_process2();
+    }
+    else 
+    {
+        while(child_exit_count < 2){
+            sleep(2);
+            safe_print("Parent Process: Preceding...\n");
         }
-
-        if (write(fd2, COMMAND, strlen(COMMAND) + 1) == -1) {  // Write command
-            perror("Error writing to FIFO2");
-            exit(EXIT_FAILURE);
-        }
-
-        close(fd2);
-        exit(EXIT_SUCCESS);
+        
     }
 
-    // Parent process
-    int sum = 0;
-
-    // Enter a loop, printing a message containing "proceeding" every two seconds
-    print_proceeding_message(10);
-
-    // Open FIFO1 for reading sum from Child Process 1
-    int fd1_read = open(FIFO1, O_RDONLY);
-    if (fd1_read == -1) {
-        perror("Error opening FIFO1 for reading");
+    int fd1 = open("fifo1", O_WRONLY);
+    int fd2 = open("fifo2", O_WRONLY | O_APPEND);
+    if (fd1 == -1 || fd2 == -1) {
+        perror("Failed to open FIFOs");
         exit(EXIT_FAILURE);
     }
 
-    // Read sum from FIFO1
-    int numbers_read[n];
-    if (read(fd1_read, numbers_read, sizeof(numbers_read)) == -1) {
-        perror("Error reading from FIFO1");
-        exit(EXIT_FAILURE);
-    }
+    parent_process(fd1, fd2, numbers, 2); // Total number of children processes is 2
 
-    for (int i = 0; i < n; ++i) {
-        sum += numbers_read[i];
-    }
-
-    printf("Parent Process: Received sum from Child Process 1: %d\n", sum);
-
-    // Close FIFO1 for reading
-    close(fd1_read);
-
-    // Open FIFO2 for reading command from Child Process 2
-    int fd2_read = open(FIFO2, O_RDONLY);
-    if (fd2_read == -1) {
-        perror("Error opening FIFO2 for reading");
-        exit(EXIT_FAILURE);
-    }
-
-    // Read command from FIFO2
-    char command[20];
-    if (read(fd2_read, command, sizeof(command)) == -1) {
-        perror("Error reading from FIFO2");
-        exit(EXIT_FAILURE);
-    }
-
-    close(fd2_read);
-
-    if (strcmp(command, COMMAND) != 0) {
-        fprintf(stderr, "Error: Invalid command received from Child Process 2\n");
-        exit(EXIT_FAILURE);
-    }
-
-    printf("Parent Process: Received command from Child Process 2: %s\n", command);
-
-    printf("Sum of results of all child processes: %d\n", sum);
-
-    // Print exit statuses of all processes
-    printf("Parent Process: Exit statuses of all child processes:\n");
-    while (child_count > 0) {
-        sleep(1); // Wait for child processes to terminate
-    }
-    print_exit_status(pid1, "Child Process 1");
-    print_exit_status(pid2, "Child Process 2");
-
-    exit(EXIT_SUCCESS);
+    safe_print("Parent Process: Exit statuses of all child processes:\n");
+    return EXIT_SUCCESS;
 }
