@@ -1,11 +1,26 @@
 #include "concurrent_file_access_system.h"
 
+void signal_handler(int signal)
+{
+    if(signal == SIGINT)
+    {
+        fprintf(stderr, "Client %d received SIGINT.\n", getpid());
+        exit(EXIT_SUCCESS);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     int server_pid;
     int server_fifo_fd, client_fifo_fd;
     char message[100];
     char client_fifo[CLIENT_FIFO_NAME_LEN];
+
+    if(signal(SIGINT, signal_handler) == SIG_ERR)
+    {
+        fprintf(stderr, "Error setting signal handler: %s (errno=%d)\n", strerror(errno), errno);
+        exit(EXIT_FAILURE);
+    }
 
     if(argc != 3)
     {
