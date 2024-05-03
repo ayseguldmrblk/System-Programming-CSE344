@@ -7,12 +7,6 @@ int main(int argc, char *argv[])
     char message[100];
     char client_fifo[CLIENT_FIFO_NAME_LEN];
 
-    if(create_client_fifo(client_fifo) == -1)
-    {
-        exit(EXIT_FAILURE);
-    }
-    print("Client FIFO created\n");
-
     if(argc != 3)
     {
         fprintf(stderr, "Usage: %s <Connect/tryConnect> ServerPID\n", argv[0]);
@@ -20,35 +14,109 @@ int main(int argc, char *argv[])
     }
     else 
     {
-        int connect = connect_or_tryconnect(argv[1]);
-    
-        if(connect == 0) //Connect
+        snprintf(client_fifo, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_TEMPLATE, getpid());
+        if(create_client_fifo(client_fifo) == -1)
         {
-            server_pid = atoi(argv[2]);
-            umask(0);
-            snprintf(client_fifo, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_TEMPLATE, (long)getpid());
-            server_fifo_fd = open(SERVER_FIFO, O_WRONLY);
-            if(server_fifo_fd == -1)
-            {
-                fprintf(stderr, "Error opening server FIFO: %s\n", strerror(errno));
-                exit(EXIT_FAILURE);
-            }
-            
-            sprintf(message, "Client %d connected\n", getpid());
-            log_message(message);
-
+            exit(EXIT_FAILURE);
         }
-        else if(connect == 1) //tryConnect
-        {
-            int server_pid = atoi(argv[2]);
-            sprintf(message, "Client %d trying to connect\n", getpid());
-            log_message(message);
+        print("Client FIFO created.\n");
+        int connect_type = (strcmp(argv[1], "Connect") == 0) ? CONNECT : TRY_CONNECT;
+        server_pid = atoi(argv[2]);
 
+        server_fifo_fd = open(SERVER_FIFO_TEMPLATE, O_WRONLY);
+        if(server_fifo_fd == -1)
+        {
+            fprintf(stderr, "Error opening server FIFO: %s (errno=%d)\n", strerror(errno), errno);
+            exit(EXIT_FAILURE);
+        }
+        else 
+        {
+            fprintf(stderr, "Server FIFO opened: %d\n", server_fifo_fd);
+        }
+
+        request_t connect_request;
+        connect_request.client_pid = getpid();
+        connect_request.connection_type = connect_type;
+        connect_request.operation_type = NONE; // No operation at first
+
+        if(write(server_fifo_fd, &connect_request, sizeof(request_t)) == -1)
+        {
+            fprintf(stderr, "Error writing to server FIFO: %s (errno=%d)\n", strerror(errno), errno);
+            exit(EXIT_FAILURE);
+        }
+        else 
+        {
+            fprintf(stderr, "Connection request sent to server: %d\n", server_pid);
+        }
+
+        int client_fifo_fd = open(client_fifo, O_RDONLY); 
+        if(client_fifo_fd == -1)
+        {
+            fprintf(stderr, "Error opening client FIFO: %s (errno=%d)\n", strerror(errno), errno);
+            exit(EXIT_FAILURE);
         }
         else
         {
-            fprintf(stderr, "Usage: %s <Connect/tryConnect> ServerPID\n", argv[0]);
+            fprintf(stderr, "Client %d FIFO opened.\n", getpid());
+        }
+
+        response_t response;
+        if(read(client_fifo_fd, &response, sizeof(response_t)) == -1)
+        {
+            fprintf(stderr, "Error reading from client FIFO: %s (errno=%d)\n", strerror(errno), errno);
             exit(EXIT_FAILURE);
         }
+        else
+        {
+            fprintf(stdout, "Response from server: %s", response.body);
+        }
+       
+        if(response.status == SUCCESS)
+        {
+            while(1)
+            {
+                print("Enter command: ");
+                fgets(message, sizeof(message), stdin);
+                message[strcspn(message, "\n")] = '\0'; 
+                
+                command_t command = parse_command(message);
+                if(command.operation_type == INVALID_OPERATION)
+                {
+                    printf("Invalid command.\n");
+                    continue;
+                }
+                else 
+                {
+                    send_request(getpid(), connect_type, command.operation_type, command, server_fifo_fd);
+                }
+
+                // Read response from server 
+                if(read(client_fifo_fd, &response, sizeof(response_t)) == -1)
+                {
+                    fprintf(stderr, "Error reading from client FIFO: %s (errno=%d)\n", strerror(errno), errno);
+                    exit(EXIT_FAILURE);
+                }
+                if(response.status == SUCCESS)
+                {
+                    fprintf(stdout, "Server response: %s", response.body);
+                }
+            }
+        }
+        else if(response.status == FAILURE)
+        {
+            fprintf(stderr, "Connection to server failed: %s", response.body);
+        }
+        else if(response.status == WAIT)
+        {
+            fprintf(stderr, "%s", response.body);
+        }
+
+        close(server_fifo_fd);
+        close(client_fifo_fd);
+
+        unlink(client_fifo);
+
+        exit(EXIT_SUCCESS);
+
     }
 }
