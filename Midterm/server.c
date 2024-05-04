@@ -520,31 +520,12 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
                     }
                 break;
             case KILL_SERVER:
-                while (!is_empty(connected_list)) 
-                {
-                    pthread_mutex_lock(&connected_list_mutex);
-                    int child_pid = dequeue(connected_list);
-                    pthread_mutex_unlock(&connected_list_mutex);
-                    kill(child_pid, SIGKILL);
-                }
-                while (!is_empty(waiting_list)) 
-                {
-                    pthread_mutex_lock(&waiting_list_mutex);
-                    int child_pid = dequeue(waiting_list);
-                    pthread_mutex_unlock(&waiting_list_mutex);
-                    kill(child_pid, SIGKILL);
-                }
-                kill(getpid(), SIGKILL);
-                // Write to log file
-                snprintf(log, sizeof(log), "Server killed. PID: %d\n", getpid());
-                log_message(log);
+
                 break;
             case QUIT:
-                // Kill the client process
-                kill(request.client_pid, SIGKILL);
-                // Write to log file
                 snprintf(log, sizeof(log), "Client %d killed.\n", request.client_pid);
                 log_message(log);
+                kill(request.client_pid, SIGKILL);
                 break;
             default:
                 break;
@@ -564,6 +545,8 @@ int main(int argc, char *argv[])
     char *dirname = NULL;
     char message[100];
     char client_fifo[CLIENT_FIFO_NAME_LEN];
+
+    signal(SIGINT, sigint_handler);
 
     if(argc != 3)
     {
@@ -634,7 +617,7 @@ int main(int argc, char *argv[])
     log_message(message);
     fprintf(stdout, "Server started with PID=%d\n", getpid());
 
-    while(1)
+    while(!kill_signal_received)
     {
 
         // Check if connected clients have plots available
@@ -707,7 +690,7 @@ int main(int argc, char *argv[])
                 }
                 send_response(SUCCESS, "Connecteeeeeed.\n", client_fd2, request.client_pid);
             }
-            else 
+            else
             {
                 handle_request(request, waiting_list, connected_list, dirname, max_clients);
                 exit(EXIT_SUCCESS);
@@ -730,10 +713,7 @@ int main(int argc, char *argv[])
                     fprintf(stderr, "Child process %d exited with status %d\n",pid, exit_status);
                 }
             }
-            else
-            {
-                fprintf(stderr, "Child process %d terminated abnormally\n", pid);
-            }
+            exit(EXIT_SUCCESS);
         }
     }
     exit(EXIT_SUCCESS);

@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
                 }
                 if(response.status == SUCCESS)
                 {
-                    fprintf(stdout, "Server response: %s", response.body);
+                    fprintf(stdout, "%s\n", response.body);
                 }
             }
         }

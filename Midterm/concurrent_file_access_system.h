@@ -63,7 +63,7 @@ typedef enum
 typedef struct response_t
 {
     response_status_t status;
-    char body[100];
+    char body[400];
 } response_t;
 
 char* help_available_operations();
