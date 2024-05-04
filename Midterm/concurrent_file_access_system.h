@@ -9,7 +9,8 @@
 
 #ifndef CONCURRENT_FILE_ACCESS_SYSTEM_H
 
-#define SERVER_FIFO_TEMPLATE "/tmp/server_fifo_%d"
+#define SERVER_FIFO_TEMPLATE "/tmp/server_fifo.%d"
+#define SERVER_FIFO_NAME_LEN (sizeof(SERVER_FIFO_TEMPLATE) + 20)
 #define LOG_FILE "log.txt"
 #define CLIENT_FIFO_TEMPLATE "/tmp/client_fifo.%d"
 #define CLIENT_FIFO_NAME_LEN (sizeof(CLIENT_FIFO_TEMPLATE) + 20)
@@ -62,11 +63,11 @@ typedef enum
 typedef struct response_t
 {
     response_status_t status;
-    char body[100];
+    char body[400];
 } response_t;
 
 char* help_available_operations();
-char* help_for_operation(operation_type_t operation);
+char* help_for_operation(char* commandAsked);
 
 int send_response(response_status_t status, const char *body, int client_fd, pid_t client_pid)
 {
