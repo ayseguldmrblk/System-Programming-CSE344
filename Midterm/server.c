@@ -10,9 +10,16 @@
 
 volatile sig_atomic_t kill_signal_received = 0;
 
+pthread_mutex_t fd_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t global_var_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t waiting_list_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t connected_list_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 void sigint_handler(int sig) 
 {
+    pthread_mutex_lock(&global_var_mutex);
     kill_signal_received = 1;
+    pthread_mutex_unlock(&global_var_mutex);
 }
 
 char* help_available_operations()
@@ -599,6 +606,7 @@ int main(int argc, char *argv[])
     log_message(message);
     fprintf(stdout, "Server started with PID=%d\n", getpid());
 
+    pthread_mutex_lock(&global_var_mutex);
     while(!kill_signal_received)
     {
 
@@ -689,5 +697,6 @@ int main(int argc, char *argv[])
             }
         }
     }
+    pthread_mutex_unlock(&global_var_mutex);
     exit(EXIT_SUCCESS);
 }

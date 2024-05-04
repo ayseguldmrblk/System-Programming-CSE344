@@ -15,9 +15,6 @@
 #define CLIENT_FIFO_NAME_LEN (sizeof(CLIENT_FIFO_TEMPLATE) + 20)
 #define MAX_LINE_LENGTH 1000
 
-pthread_mutex_t waiting_list_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t connected_list_mutex = PTHREAD_MUTEX_INITIALIZER;
-
 typedef enum 
 {
     CONNECT = 0,
