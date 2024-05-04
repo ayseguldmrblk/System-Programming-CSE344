@@ -20,6 +20,7 @@ void sigint_handler(int sig)
     pthread_mutex_lock(&global_var_mutex);
     kill_signal_received = 1;
     pthread_mutex_unlock(&global_var_mutex);
+    exit(EXIT_SUCCESS);
 }
 
 char* help_available_operations()
@@ -376,9 +377,57 @@ int archive_server(const char* filename, const char* server_dir)
     }
 }
 
-void handle_request(request_t request, int client_fd, queue_t *waiting_list, queue_t *connected_list, char *dirname, int max_clients)
+void handle_request(request_t request, queue_t *waiting_list, queue_t *connected_list, char *dirname, int max_clients)
 {
+    printf("In handle_request\n");
     char log[100];
+    int client_fd;
+    int client_server_fd;
+    char client_fifo[CLIENT_FIFO_NAME_LEN], client_server_fifo[CLIENT_FIFO_NAME_LEN];
+    snprintf(client_fifo,CLIENT_FIFO_NAME_LEN,CLIENT_FIFO_TEMPLATE,request.client_pid);
+    snprintf(client_server_fifo,SERVER_CLIENT_FIFO_NAME_LEN,SERVER_CLIENT_FIFO_TEMPLATE, get_pid());
+    printf("Client %d requested operation %d\n", request.client_pid, request.operation_type);
+
+    if((client_fd = open(client_fifo, O_WRONLY)) == -1)
+    {
+        fprintf(stderr, "Error opening client FIFO: %s (errno=%d)\n", strerror(errno), errno);
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        fprintf(stdout, "Client FIFO opened: %d\n", client_fd);
+    }
+    if(mkfifo(client_server_fifo, 0666) == -1)
+    {
+        fprintf(stderr, "Error creating client FIFO: %s (errno=%d)\n", strerror(errno), errno);
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        fprintf(stdout, "Client FIFO created.\n");
+    }
+    if(mkfifo(client_server_fifo, 0666) == -1)
+    {
+        fprintf(stderr, "Error creating client FIFO: %s (errno=%d)\n", strerror(errno), errno);
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        fprintf(stdout, "Client_Server FIFO created.\n");
+    }
+
+    if((client_server_fd = open(client_server_fifo, O_RDONLY)) == -1)
+    {
+        fprintf(stderr, "Error opening client FIFO: %s (errno=%d)\n", strerror(errno), errno);
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        fprintf(stdout, "Client_Server FIFO opened: %d\n", client_server_fd);
+    }
+    send_response(SUCCESS, "Server client fifo created\n", client_server_fd, getpid());
+
+    /*
     char *file_list = NULL;
     char *file_content = NULL;
     int status = -2;
@@ -524,6 +573,7 @@ void handle_request(request_t request, int client_fd, queue_t *waiting_list, que
                 break;
         }
     }
+    */
 }
 
 int main(int argc, char *argv[])
@@ -579,14 +629,15 @@ int main(int argc, char *argv[])
     }
    
     umask(0);
-    snprintf(server_fifo, sizeof(server_fifo), SERVER_FIFO_TEMPLATE, getpid());
-    if(mkfifo(SERVER_FIFO_TEMPLATE, 0666) == -1)
+    snprintf(server_fifo, SERVER_FIFO_NAME_LEN, SERVER_FIFO_TEMPLATE, getpid());
+    print(server_fifo);
+    if(mkfifo(server_fifo, 0666) == -1)
     {
         fprintf(stderr, "Error creating server FIFO: %s (errno=%d)\n", strerror(errno), errno);
         exit(EXIT_FAILURE);
     }
 
-    server_fd = open(SERVER_FIFO_TEMPLATE, O_RDONLY|O_NONBLOCK);
+    server_fd = open(server_fifo, O_RDONLY|O_NONBLOCK);
     if(server_fd == -1)
     {
         fprintf(stderr, "Error opening server FIFO: %s (errno=%d)\n", strerror(errno), errno);
@@ -594,7 +645,7 @@ int main(int argc, char *argv[])
     }
 
     /* Open the server FIFO for writing so that it doesn't return EOF */
-    dummy_fd = open(SERVER_FIFO_TEMPLATE, O_WRONLY );
+    dummy_fd = open(server_fifo, O_WRONLY );
     if(dummy_fd == -1)
     {
         fprintf(stderr, "Error opening server FIFO for writing: %s (errno=%d)\n", strerror(errno), errno);
@@ -606,10 +657,10 @@ int main(int argc, char *argv[])
     log_message(message);
     fprintf(stdout, "Server started with PID=%d\n", getpid());
 
-    pthread_mutex_lock(&global_var_mutex);
-    while(!kill_signal_received)
+    while(1)
     {
 
+        /*
         // Check if connected clients have plots available
         if (!is_empty(connected_list) && !is_empty(waiting_list))
         {
@@ -636,6 +687,7 @@ int main(int argc, char *argv[])
                 }
             }
         }
+        */
 
         ssize_t bytes_read;
         while ((bytes_read = read(server_fd, &request, sizeof(request_t))) == -1) 
@@ -662,17 +714,8 @@ int main(int argc, char *argv[])
         }
         else if(pid == 0)
         {
-            // Child process
-            client_fd = open(client_fifo, O_WRONLY);
-            if(client_fd == -1)
-            {
-                fprintf(stderr, "Error opening client FIFO: %s (errno=%d)\n", strerror(errno), errno);
-                exit(EXIT_FAILURE);
-            }
-
-            handle_request(request, client_fd, waiting_list, connected_list, dirname, max_clients);
-
-            exit(EXIT_SUCCESS);
+            printf("In child process\n");
+            handle_request(request, waiting_list, connected_list, dirname, max_clients);
         }
         else 
         {
@@ -697,6 +740,5 @@ int main(int argc, char *argv[])
             }
         }
     }
-    pthread_mutex_unlock(&global_var_mutex);
     exit(EXIT_SUCCESS);
 }

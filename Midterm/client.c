@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
     int server_fifo_fd;
     char message[100];
     char client_fifo[CLIENT_FIFO_NAME_LEN];
+    char server_client_fifo[SERVER_CLIENT_FIFO_NAME_LEN];
 
     if(signal(SIGINT, signal_handler) == SIG_ERR)
     {
@@ -38,7 +39,9 @@ int main(int argc, char *argv[])
         int connect_type = (strcmp(argv[1], "Connect") == 0) ? CONNECT : TRY_CONNECT;
         server_pid = atoi(argv[2]);
 
-        server_fifo_fd = open(SERVER_FIFO_TEMPLATE, O_WRONLY);
+        char server_fifo[SERVER_FIFO_NAME_LEN];
+        snprintf(server_fifo, SERVER_FIFO_NAME_LEN, SERVER_FIFO_TEMPLATE, server_pid);
+        server_fifo_fd = open(server_fifo, O_WRONLY);
         if(server_fifo_fd == -1)
         {
             fprintf(stderr, "Error opening server FIFO: %s (errno=%d)\n", strerror(errno), errno);
@@ -83,6 +86,7 @@ int main(int argc, char *argv[])
         }
         else
         {
+            
             fprintf(stdout, "Response from server: %s", response.body);
         }
        

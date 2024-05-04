@@ -9,10 +9,13 @@
 
 #ifndef CONCURRENT_FILE_ACCESS_SYSTEM_H
 
-#define SERVER_FIFO_TEMPLATE "/tmp/server_fifo_%d"
+#define SERVER_FIFO_TEMPLATE "/tmp/server_fifo.%d"
+#define SERVER_FIFO_NAME_LEN (sizeof(SERVER_FIFO_TEMPLATE) + 20)
 #define LOG_FILE "log.txt"
 #define CLIENT_FIFO_TEMPLATE "/tmp/client_fifo.%d"
 #define CLIENT_FIFO_NAME_LEN (sizeof(CLIENT_FIFO_TEMPLATE) + 20)
+#define SERVER_CLIENT_FIFO_TEMPLATE "/tmp/server_client_fifo.%d"
+#define SERVER_CLIENT_FIFO_NAME_LEN (sizeof(SERVER_CLIENT_FIFO_TEMPLATE) + 20)
 #define MAX_LINE_LENGTH 1000
 
 typedef enum 
