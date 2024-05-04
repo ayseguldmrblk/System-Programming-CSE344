@@ -11,7 +11,7 @@
 
 #define SERVER_FIFO_TEMPLATE "/tmp/server_fifo_%d"
 #define LOG_FILE "log.txt"
-#define CLIENT_FIFO_TEMPLATE "/tmp/client_fifo.%ld"
+#define CLIENT_FIFO_TEMPLATE "/tmp/client_fifo.%d"
 #define CLIENT_FIFO_NAME_LEN (sizeof(CLIENT_FIFO_TEMPLATE) + 20)
 #define MAX_LINE_LENGTH 1000
 
@@ -129,9 +129,9 @@ command_t parse_command(char *input)
 {
     command_t command;
     memset(&command, 0, sizeof(command)); // Initialize command struct to zero
-    command.filename == NULL;
-    command.line == -1;
-    command.data == NULL;
+    snprintf(command.filename, sizeof(command.filename), "%s", ""); // Initialize filename to empty string
+    command.line = -1;
+    snprintf(command.data, sizeof(command.data), "%s", ""); // Initialize data to empty string
 
     // Extract the operation type
     char *token = strtok(input, " ");

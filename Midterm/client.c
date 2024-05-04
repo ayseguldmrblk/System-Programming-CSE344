@@ -12,7 +12,7 @@ void signal_handler(int signal)
 int main(int argc, char *argv[])
 {
     int server_pid;
-    int server_fifo_fd, client_fifo_fd;
+    int server_fifo_fd;
     char message[100];
     char client_fifo[CLIENT_FIFO_NAME_LEN];
 

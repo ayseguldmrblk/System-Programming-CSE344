@@ -5,331 +5,14 @@
 #include <unistd.h> 
 #include <dirent.h>
 #include <signal.h>
+#include <errno.h> 
+#include <string.h> 
 
 volatile sig_atomic_t kill_signal_received = 0;
 
 void sigint_handler(int sig) 
 {
     kill_signal_received = 1;
-}
-
-void handle_request(request_t request, int client_fd, queue_t *waiting_list, queue_t *connected_list, char *dirname, int max_clients)
-{
-    char log[100];
-    if(request.connection_type == CONNECT && request.operation_type == NONE)
-    {
-        if(connected_list->size == max_clients)
-        {
-            pthread_mutex_lock(&waiting_list_mutex);
-            enqueue(waiting_list, request.client_pid);
-            pthread_mutex_unlock(&waiting_list_mutex);
-            fprintf(stdout, "Client %d added to waiting list\n", request.client_pid);
-            send_response(WAIT, "Server is full. Please wait.\n", client_fd, request.client_pid);
-        }
-        else
-        {
-            pthread_mutex_lock(&connected_list_mutex);
-            enqueue(connected_list, request.client_pid);
-            pthread_mutex_unlock(&connected_list_mutex);
-            fprintf(stdout, "Client %d connected.\n", request.client_pid);
-            send_response(SUCCESS, "Connected to server.\n", client_fd, request.client_pid);
-        }
-    }
-    else if(request.connection_type == TRY_CONNECT && request.operation_type == NONE)
-    {
-        if(connected_list->size == max_clients)
-        {
-            send_response(FAILURE, "Server is full. Please try again later.\n", client_fd, request.client_pid);
-        }
-        else
-        {
-            pthread_mutex_lock(&connected_list_mutex);
-            enqueue(connected_list, request.client_pid);
-            pthread_mutex_unlock(&connected_list_mutex);
-            fprintf(stdout, "Client %d connected\n", request.client_pid);
-            send_response(SUCCESS, "Connected to server.\n", client_fd, request.client_pid);
-        }
-    }
-    else if(is_client_in_queue(connected_list, request.client_pid == 1))
-    {
-        switch (request.operation_type)
-        {
-            case HELP:
-                if(request.command.filename != NULL)
-                {
-                    send_response(SUCCESS, help_for_operation(request.operation_type), client_fd, request.client_pid);
-                }
-                else
-                {
-                    send_response(SUCCESS, help_available_operations(), client_fd, request.client_pid);
-                }
-                break;
-            case LIST:
-                    char *file_list = list();
-                    send_response(SUCCESS, file_list, client_fd, request.client_pid);
-                    free(file_list);
-                break;
-            case READ_FILE:
-                    char *file_content = read_file(request.command.filename, request.command.line);
-                    if (file_content != NULL) 
-                    {
-                        send_response(SUCCESS, file_content, client_fd, request.client_pid);
-                        free(file_content);
-                    } 
-                    else 
-                    {
-                        send_response(FAILURE, "Error reading file\n", client_fd, request.client_pid);
-                    }
-                break;
-            case WRITE_FILE:
-                    if (write_to_file(request.command.filename, request.command.line, request.command.data) == 0) 
-                    {
-                        send_response(SUCCESS, "File written successfully\n", client_fd, request.client_pid);
-                    } 
-                    else 
-                    {
-                        send_response(FAILURE, "Error writing to file\n", client_fd, request.client_pid);
-                    }
-                break;
-            case UPLOAD:
-                    if (upload_file(request.command.filename, dirname) == 0) 
-                    {
-                        send_response(SUCCESS, "File uploaded successfully\n", client_fd, request.client_pid);
-                    } 
-                    else 
-                    {
-                        send_response(FAILURE, "Error uploading file\n", client_fd, request.client_pid);
-                    }
-                break;
-            case DOWNLOAD:
-                    if (download_file(request.command.filename, dirname) == 0) 
-                    {
-                        send_response(SUCCESS, "File downloaded successfully\n", client_fd, request.client_pid);
-                    } 
-                    else 
-                    {
-                        send_response(FAILURE, "Error downloading file\n", client_fd, request.client_pid);
-                    }
-                break;
-            case ARCHIVE_SERVER:
-                    int status = archive_server(request.command.filename, dirname);
-                    if (status == 0) 
-                    {
-                        send_response(SUCCESS, "Server archived successfully.\n", client_fd, request.client_pid);
-                    } 
-                    else if(status == -1)
-                    {
-                        send_response(FAILURE, "Error archiving server.\n", client_fd, request.client_pid);
-                    }
-                    else if(status == -2)
-                    {
-                        send_response(FAILURE, "Error archiving server. Child process terminated abnormally.\n", client_fd, request.client_pid);
-                    }
-                break;
-            case KILL_SERVER:
-                while (!is_queue_empty(connected_list)) 
-                {
-                    pthread_mutex_lock(&connected_list_mutex);
-                    int child_pid = dequeue(connected_list);
-                    pthread_mutex_unlock(&connected_list_mutex);
-                    kill(child_pid, SIGKILL);
-                }
-                while (!is_queue_empty(waiting_list)) 
-                {
-                    pthread_mutex_lock(&waiting_list_mutex);
-                    int child_pid = dequeue(waiting_list);
-                    pthread_mutex_unlock(&waiting_list_mutex);
-                    kill(child_pid, SIGKILL);
-                }
-                kill(getpid(), SIGKILL);
-                // Write to log file
-                snprintf(log, sizeof(log), "Server killed. PID: %d\n", getpid());
-                log_message(log);
-                break;
-            case QUIT:
-                // Kill the client process
-                kill(request.client_pid, SIGKILL);
-                // Write to log file
-                snprintf(log, sizeof(log), "Client %d killed.\n", request.client_pid);
-                log_message(log);
-                break;
-            default:
-                break;
-        }
-    }
-}
-
-int main(int argc, char *argv[])
-{
-    int server_fd, dummy_fd, client_fd, max_clients;
-    char server_fifo[100];
-    request_t request; 
-    response_t response;
-    queue_t *waiting_list = create_queue();
-    queue_t *connected_list = create_queue();
-    char *dirname = NULL;
-    char message[100];
-    char client_fifo[CLIENT_FIFO_NAME_LEN];
-
-    if(argc != 3)
-    {
-        fprintf(stderr, "Usage: %s <dirname> <max. #ofClients>\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
-    else 
-    {
-        dirname = argv[1]; 
-        max_clients = atoi(argv[2]);
-    }
-
-    // Register signal handler for SIGINT
-    if (signal(SIGINT, sigint_handler) == SIG_ERR) 
-    {
-        perror("Error registering signal handler");
-        exit(EXIT_FAILURE);
-    }
-
-    // Create directory if it doesn't exist
-    if (mkdir(dirname, 0777) == -1 && errno != EEXIST) 
-    {
-        perror("Error creating directory");
-        exit(EXIT_FAILURE);
-    }
-
-    // Change current working directory to the specified directory
-    if (chdir(dirname) == -1) 
-    {
-        perror("Error changing directory");
-        exit(EXIT_FAILURE);
-    }
-
-    // Create log file
-    int log_file = open(LOG_FILE, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-    if (log_file == -1) 
-    {
-        fprintf(stderr, "Error creating log file: %s\n", strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-   
-    umask(0);
-    snprintf(server_fifo, sizeof(server_fifo), SERVER_FIFO_TEMPLATE, getpid());
-    if(mkfifo(SERVER_FIFO_TEMPLATE, 0666) == -1)
-    {
-        fprintf(stderr, "Error creating server FIFO: %s (errno=%d)\n", strerror(errno), errno);
-        exit(EXIT_FAILURE);
-    }
-
-    server_fd = open(SERVER_FIFO_TEMPLATE, O_RDONLY|O_NONBLOCK);
-    if(server_fd == -1)
-    {
-        fprintf(stderr, "Error opening server FIFO: %s (errno=%d)\n", strerror(errno), errno);
-        exit(EXIT_FAILURE);
-    }
-
-    /* Open the server FIFO for writing so that it doesn't return EOF */
-    dummy_fd = open(SERVER_FIFO_TEMPLATE, O_WRONLY );
-    if(dummy_fd == -1)
-    {
-        fprintf(stderr, "Error opening server FIFO for writing: %s (errno=%d)\n", strerror(errno), errno);
-        exit(EXIT_FAILURE);
-    }
-
-    // Server Start Up Message
-    snprintf(message, sizeof(message), "Server started. PID: %d\n", getpid());
-    log_message(message);
-    fprintf(stdout, "Server started with PID=%d\n", getpid());
-
-    while(!kill_signal_received)
-    {
-
-        // Check if connected clients have plots available
-        if (!is_queue_empty(connected_list) && !is_queue_empty(waiting_list))
-        {
-            // Dequeue a client from the waiting queue
-            pthread_mutex_lock(&waiting_list_mutex);
-            int waiting_client_pid = dequeue(waiting_list);
-            pthread_mutex_unlock(&waiting_list_mutex);
-            if(waiting_client_pid != -1)
-            {
-                // Dequeue a client from the connected queue
-                pthread_mutex_lock(&connected_list_mutex);
-                int connected_client_pid = dequeue(connected_list);
-                pthread_mutex_unlock(&connected_list_mutex);
-                if(connected_client_pid != -1)
-                {
-                    // Assign the plot to the waiting client
-                    pthread_mutex_lock(&connected_list_mutex);
-                    enqueue(connected_list, waiting_client_pid);
-                    pthread_mutex_unlock(&connected_list_mutex);
-                    // Notify the waiting client about the assignment
-                    char waiting_client_fifo[CLIENT_FIFO_NAME_LEN];
-                    snprintf(waiting_client_fifo, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_TEMPLATE, waiting_client_pid);
-                    send_response(SUCCESS, "Connected to server.\n", waiting_client_fifo, waiting_client_pid);
-                }
-            }
-        }
-
-        ssize_t bytes_read;
-        while ((bytes_read = read(server_fd, &request, sizeof(request_t))) == -1) 
-        {
-            if (errno == EINTR) {
-                // Retry the read operation if interrupted by a signal
-                continue;
-            } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                // No data available yet, sleep for a short interval before retrying
-                usleep(100000); // Sleep for 100 milliseconds (adjust as needed)
-                continue;
-            } else {
-                // Other error occurred, handle it
-                fprintf(stderr, "Error reading from server FIFO: %s (errno=%d)\n", strerror(errno), errno);
-                exit(EXIT_FAILURE);
-            }
-        }
-
-        pid_t pid = fork();
-        if(pid < 0)
-        {
-            perror("Fork failed");
-            exit(EXIT_FAILURE);
-        }
-        else if(pid == 0)
-        {
-            // Child process
-            client_fd = open(client_fifo, O_WRONLY);
-            if(client_fd == -1)
-            {
-                fprintf(stderr, "Error opening client FIFO: %s (errno=%d)\n", strerror(errno), errno);
-                exit(EXIT_FAILURE);
-            }
-
-            handle_request(request, client_fd, waiting_list, connected_list, dirname, max_clients);
-
-            exit(EXIT_SUCCESS);
-        }
-        else 
-        {
-            //Parent process
-            int status;
-            waitpid(pid, &status, 0);
-            if(WIFEXITED(status))
-            {
-                int exit_status = WEXITSTATUS(status);
-                if(exit_status == 0)
-                {
-                    fprintf(stdout, "Child process %d exited successfully\n", pid);
-                }
-                else
-                {
-                    fprintf(stderr, "Child process %d exited with status %d\n",pid, exit_status);
-                }
-            }
-            else
-            {
-                fprintf(stderr, "Child process %d terminated abnormally\n", pid);
-            }
-        }
-    }
-    exit(EXIT_SUCCESS);
 }
 
 char* help_available_operations()
@@ -390,7 +73,7 @@ char* list()
     dir = opendir(".");
     if (dir == NULL) 
     {
-        fprintf(stderr, "Error opening directory: %s (error=%d)\n", errno, stderror(errno));
+        fprintf(stderr, "Error opening directory: %s (error=%d)\n", strerror(errno), errno);
         exit(EXIT_FAILURE);
     }
 
@@ -398,7 +81,7 @@ char* list()
     list = (char*)malloc(1);
     if (list == NULL) 
     {
-        fprintf(stderr, "Memory allocation failed: %s (error=%d)\n", errno, stderror(errno));
+        fprintf(stderr, "Memory allocation failed: %s (error=%d)\n", strerror(errno), errno);
         exit(EXIT_FAILURE);
     }
     list[0] = '\0';
@@ -684,4 +367,327 @@ int archive_server(const char* filename, const char* server_dir)
             return -2; // Failure
         }
     }
+}
+
+void handle_request(request_t request, int client_fd, queue_t *waiting_list, queue_t *connected_list, char *dirname, int max_clients)
+{
+    char log[100];
+    char *file_list = NULL;
+    char *file_content = NULL;
+    int status = -2;
+
+    if(request.connection_type == CONNECT && request.operation_type == NONE)
+    {
+        if(connected_list->size == max_clients)
+        {
+            pthread_mutex_lock(&waiting_list_mutex);
+            enqueue(waiting_list, request.client_pid);
+            pthread_mutex_unlock(&waiting_list_mutex);
+            fprintf(stdout, "Client %d added to waiting list\n", request.client_pid);
+            send_response(WAIT, "Server is full. Please wait.\n", client_fd, request.client_pid);
+        }
+        else
+        {
+            pthread_mutex_lock(&connected_list_mutex);
+            enqueue(connected_list, request.client_pid);
+            pthread_mutex_unlock(&connected_list_mutex);
+            fprintf(stdout, "Client %d connected.\n", request.client_pid);
+            send_response(SUCCESS, "Connected to server.\n", client_fd, request.client_pid);
+        }
+    }
+    else if(request.connection_type == TRY_CONNECT && request.operation_type == NONE)
+    {
+        if(connected_list->size == max_clients)
+        {
+            send_response(FAILURE, "Server is full. Please try again later.\n", client_fd, request.client_pid);
+        }
+        else
+        {
+            pthread_mutex_lock(&connected_list_mutex);
+            enqueue(connected_list, request.client_pid);
+            pthread_mutex_unlock(&connected_list_mutex);
+            fprintf(stdout, "Client %d connected\n", request.client_pid);
+            send_response(SUCCESS, "Connected to server.\n", client_fd, request.client_pid);
+        }
+    }
+    else if(is_client_in_queue(connected_list, request.client_pid == 1))
+    {
+        switch (request.operation_type)
+        {
+            case HELP:
+                if(strcmp(request.command.filename, "") != 0)
+                {
+                    send_response(SUCCESS, help_for_operation(request.operation_type), client_fd, request.client_pid);
+                }
+                else
+                {
+                    send_response(SUCCESS, help_available_operations(), client_fd, request.client_pid);
+                }
+                break;
+            case LIST:
+                    file_list = list();
+                    send_response(SUCCESS, file_list, client_fd, request.client_pid);
+                    free(file_list);
+                break;
+            case READ_FILE:
+                    file_content = read_file(request.command.filename, request.command.line);
+                    if (file_content != NULL) 
+                    {
+                        send_response(SUCCESS, file_content, client_fd, request.client_pid);
+                        free(file_content);
+                    } 
+                    else 
+                    {
+                        send_response(FAILURE, "Error reading file\n", client_fd, request.client_pid);
+                    }
+                break;
+            case WRITE_FILE:
+                    if (write_to_file(request.command.filename, request.command.line, request.command.data) == 0) 
+                    {
+                        send_response(SUCCESS, "File written successfully\n", client_fd, request.client_pid);
+                    } 
+                    else 
+                    {
+                        send_response(FAILURE, "Error writing to file\n", client_fd, request.client_pid);
+                    }
+                break;
+            case UPLOAD:
+                    if (upload_file(request.command.filename, dirname) == 0) 
+                    {
+                        send_response(SUCCESS, "File uploaded successfully\n", client_fd, request.client_pid);
+                    } 
+                    else 
+                    {
+                        send_response(FAILURE, "Error uploading file\n", client_fd, request.client_pid);
+                    }
+                break;
+            case DOWNLOAD:
+                    if (download_file(request.command.filename, dirname) == 0) 
+                    {
+                        send_response(SUCCESS, "File downloaded successfully\n", client_fd, request.client_pid);
+                    } 
+                    else 
+                    {
+                        send_response(FAILURE, "Error downloading file\n", client_fd, request.client_pid);
+                    }
+                break;
+            case ARCHIVE_SERVER:
+                    status = archive_server(request.command.filename, dirname);
+                    if (status == 0) 
+                    {
+                        send_response(SUCCESS, "Server archived successfully.\n", client_fd, request.client_pid);
+                    } 
+                    else if(status == -1)
+                    {
+                        send_response(FAILURE, "Error archiving server.\n", client_fd, request.client_pid);
+                    }
+                    else if(status == -2)
+                    {
+                        send_response(FAILURE, "Error archiving server. Child process terminated abnormally.\n", client_fd, request.client_pid);
+                    }
+                break;
+            case KILL_SERVER:
+                while (!is_empty(connected_list)) 
+                {
+                    pthread_mutex_lock(&connected_list_mutex);
+                    int child_pid = dequeue(connected_list);
+                    pthread_mutex_unlock(&connected_list_mutex);
+                    kill(child_pid, SIGKILL);
+                }
+                while (!is_empty(waiting_list)) 
+                {
+                    pthread_mutex_lock(&waiting_list_mutex);
+                    int child_pid = dequeue(waiting_list);
+                    pthread_mutex_unlock(&waiting_list_mutex);
+                    kill(child_pid, SIGKILL);
+                }
+                kill(getpid(), SIGKILL);
+                // Write to log file
+                snprintf(log, sizeof(log), "Server killed. PID: %d\n", getpid());
+                log_message(log);
+                break;
+            case QUIT:
+                // Kill the client process
+                kill(request.client_pid, SIGKILL);
+                // Write to log file
+                snprintf(log, sizeof(log), "Client %d killed.\n", request.client_pid);
+                log_message(log);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    int server_fd, dummy_fd, max_clients;
+    int client_fd = 0;
+    char server_fifo[100];
+    request_t request; 
+    queue_t *waiting_list = create_queue();
+    queue_t *connected_list = create_queue();
+    char *dirname = NULL;
+    char message[100];
+    char client_fifo[CLIENT_FIFO_NAME_LEN];
+
+    if(argc != 3)
+    {
+        fprintf(stderr, "Usage: %s <dirname> <max. #ofClients>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+    else 
+    {
+        dirname = argv[1]; 
+        max_clients = atoi(argv[2]);
+    }
+
+    // Register signal handler for SIGINT
+    if (signal(SIGINT, sigint_handler) == SIG_ERR) 
+    {
+        perror("Error registering signal handler");
+        exit(EXIT_FAILURE);
+    }
+
+    // Create directory if it doesn't exist
+    if (mkdir(dirname, 0777) == -1 && errno != EEXIST) 
+    {
+        perror("Error creating directory");
+        exit(EXIT_FAILURE);
+    }
+
+    // Change current working directory to the specified directory
+    if (chdir(dirname) == -1) 
+    {
+        perror("Error changing directory");
+        exit(EXIT_FAILURE);
+    }
+
+    // Create log file
+    int log_file = open(LOG_FILE, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (log_file == -1) 
+    {
+        fprintf(stderr, "Error creating log file: %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+   
+    umask(0);
+    snprintf(server_fifo, sizeof(server_fifo), SERVER_FIFO_TEMPLATE, getpid());
+    if(mkfifo(SERVER_FIFO_TEMPLATE, 0666) == -1)
+    {
+        fprintf(stderr, "Error creating server FIFO: %s (errno=%d)\n", strerror(errno), errno);
+        exit(EXIT_FAILURE);
+    }
+
+    server_fd = open(SERVER_FIFO_TEMPLATE, O_RDONLY|O_NONBLOCK);
+    if(server_fd == -1)
+    {
+        fprintf(stderr, "Error opening server FIFO: %s (errno=%d)\n", strerror(errno), errno);
+        exit(EXIT_FAILURE);
+    }
+
+    /* Open the server FIFO for writing so that it doesn't return EOF */
+    dummy_fd = open(SERVER_FIFO_TEMPLATE, O_WRONLY );
+    if(dummy_fd == -1)
+    {
+        fprintf(stderr, "Error opening server FIFO for writing: %s (errno=%d)\n", strerror(errno), errno);
+        exit(EXIT_FAILURE);
+    }
+
+    // Server Start Up Message
+    snprintf(message, sizeof(message), "Server started. PID: %d\n", getpid());
+    log_message(message);
+    fprintf(stdout, "Server started with PID=%d\n", getpid());
+
+    while(!kill_signal_received)
+    {
+
+        // Check if connected clients have plots available
+        if (!is_empty(connected_list) && !is_empty(waiting_list))
+        {
+            // Dequeue a client from the waiting queue
+            pthread_mutex_lock(&waiting_list_mutex);
+            int waiting_client_pid = dequeue(waiting_list);
+            pthread_mutex_unlock(&waiting_list_mutex);
+            if(waiting_client_pid != -1)
+            {
+                // Dequeue a client from the connected queue
+                pthread_mutex_lock(&connected_list_mutex);
+                int connected_client_pid = dequeue(connected_list);
+                pthread_mutex_unlock(&connected_list_mutex);
+                if(connected_client_pid != -1)
+                {
+                    // Assign the plot to the waiting client
+                    pthread_mutex_lock(&connected_list_mutex);
+                    enqueue(connected_list, waiting_client_pid);
+                    pthread_mutex_unlock(&connected_list_mutex);
+                    // Notify the waiting client about the assignment
+                    char waiting_client_fifo[CLIENT_FIFO_NAME_LEN];
+                    snprintf(waiting_client_fifo, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_TEMPLATE, waiting_client_pid);
+                    send_response(SUCCESS, "Connected to server.\n", client_fd, waiting_client_pid);
+                }
+            }
+        }
+
+        ssize_t bytes_read;
+        while ((bytes_read = read(server_fd, &request, sizeof(request_t))) == -1) 
+        {
+            if (errno == EINTR) {
+                // Retry the read operation if interrupted by a signal
+                continue;
+            } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                // No data available yet, sleep for a short interval before retrying
+                usleep(100000); // Sleep for 100 milliseconds (adjust as needed)
+                continue;
+            } else {
+                // Other error occurred, handle it
+                fprintf(stderr, "Error reading from server FIFO: %s (errno=%d)\n", strerror(errno), errno);
+                exit(EXIT_FAILURE);
+            }
+        }
+
+        pid_t pid = fork();
+        if(pid < 0)
+        {
+            perror("Fork failed");
+            exit(EXIT_FAILURE);
+        }
+        else if(pid == 0)
+        {
+            // Child process
+            client_fd = open(client_fifo, O_WRONLY);
+            if(client_fd == -1)
+            {
+                fprintf(stderr, "Error opening client FIFO: %s (errno=%d)\n", strerror(errno), errno);
+                exit(EXIT_FAILURE);
+            }
+
+            handle_request(request, client_fd, waiting_list, connected_list, dirname, max_clients);
+
+            exit(EXIT_SUCCESS);
+        }
+        else 
+        {
+            //Parent process
+            int status;
+            waitpid(pid, &status, 0);
+            if(WIFEXITED(status))
+            {
+                int exit_status = WEXITSTATUS(status);
+                if(exit_status == 0)
+                {
+                    fprintf(stdout, "Child process %d exited successfully\n", pid);
+                }
+                else
+                {
+                    fprintf(stderr, "Child process %d exited with status %d\n",pid, exit_status);
+                }
+            }
+            else
+            {
+                fprintf(stderr, "Child process %d terminated abnormally\n", pid);
+            }
+        }
+    }
+    exit(EXIT_SUCCESS);
 }
