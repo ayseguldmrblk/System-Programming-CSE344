@@ -4,6 +4,9 @@ void signal_handler(int signal)
 {
     if(signal == SIGINT)
     {
+        char message[100];
+        snprintf(message, sizeof(message), "Client %d received SIGINT.\n", getpid());
+        log_message(message);
         fprintf(stderr, "Client %d received SIGINT.\n", getpid());
         exit(EXIT_SUCCESS);
     }

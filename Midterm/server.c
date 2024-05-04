@@ -8,19 +8,41 @@
 #include <errno.h> 
 #include <string.h> 
 
-volatile sig_atomic_t kill_signal_received = 0;
+int kill_signal_received = 0;
 
 pthread_mutex_t fd_mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t global_var_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t waiting_list_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t connected_list_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void sigint_handler(int sig) 
 {
-    pthread_mutex_lock(&global_var_mutex);
     kill_signal_received = 1;
-    pthread_mutex_unlock(&global_var_mutex);
     exit(EXIT_SUCCESS);
+}
+
+void kill_parent_and_children(pid_t parent_pid) 
+{
+    // Kill the parent process
+    kill(parent_pid, SIGKILL);
+
+    // Wait for the parent process to terminate
+    waitpid(parent_pid, NULL, 0);
+
+    // Kill all child processes recursively
+    pid_t child_pid;
+    while ((child_pid = fork()) != 0) {
+        if (child_pid == -1) {
+            perror("Error forking child process");
+            exit(EXIT_FAILURE);
+        } else if (child_pid == 0) {
+            // Child process
+            kill(getpid(), SIGKILL); // Kill itself
+            exit(EXIT_SUCCESS);
+        } else {
+            // Parent process
+            waitpid(child_pid, NULL, 0); // Wait for child to terminate
+        }
+    }
 }
 
 char* help_available_operations()
@@ -185,6 +207,10 @@ char* read_file(const char* filename, int line_number)
 
 int write_to_file(const char* filename, int line_number, const char* content) 
 {
+    printf("In write_to_file\n");
+    printf("Filename: %s\n", filename);
+    printf("Line number: %d\n", line_number);
+    printf("Content: %s\n", content);
     FILE* file = fopen(filename, "a+"); // Open file in append mode or create if not exists
     if (file == NULL) 
     {
@@ -519,9 +545,6 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
                         send_response(FAILURE, "Error archiving server. Child process terminated abnormally.\n", client_fd, request.client_pid);
                     }
                 break;
-            case KILL_SERVER:
-
-                break;
             case QUIT:
                 snprintf(log, sizeof(log), "Client %d killed.\n", request.client_pid);
                 log_message(log);
@@ -617,7 +640,7 @@ int main(int argc, char *argv[])
     log_message(message);
     fprintf(stdout, "Server started with PID=%d\n", getpid());
 
-    while(!kill_signal_received)
+    while(1)
     {
 
         // Check if connected clients have plots available
@@ -650,6 +673,7 @@ int main(int argc, char *argv[])
         ssize_t bytes_read;
         while ((bytes_read = read(server_fd, &request, sizeof(request_t))) == -1) 
         {
+
             if (errno == EINTR) {
                 // Retry the read operation if interrupted by a signal
                 continue;
@@ -663,58 +687,88 @@ int main(int argc, char *argv[])
                 exit(EXIT_FAILURE);
             }
         }
-
-
-        pid_t pid = fork();
-        if(pid < 0)
+        printf("Operation type: %d\n", request.operation_type);
+        if(request.operation_type == KILL_SERVER)
         {
-            perror("Fork failed");
-            exit(EXIT_FAILURE);
-        }
-        else if(pid == 0)
-        {
-            if(request.operation_type == NONE)
-            {
-                enqueue(waiting_list, request.client_pid);
-                int client_fd2;
-                char client_fifo2[CLIENT_FIFO_NAME_LEN];
-                snprintf(client_fifo2, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_TEMPLATE, request.client_pid);
-                if((client_fd2 = open(client_fifo2, O_WRONLY)) == -1)
-                {
-                    fprintf(stderr, "Error opening client FIFO: %s (errno=%d)\n", strerror(errno), errno);
-                    exit(EXIT_FAILURE);
-                }
-                else
-                {
-                    fprintf(stdout, "Client FIFO2 opened: %d\n", client_fd2);
-                }
-                send_response(SUCCESS, "Connecteeeeeed.\n", client_fd2, request.client_pid);
-            }
-            else
-            {
-                handle_request(request, waiting_list, connected_list, dirname, max_clients);
-                exit(EXIT_SUCCESS);
-            }
-        }
-        else 
-        {
-            //Parent process
-            int status;
-            waitpid(pid, &status, 0);
-            if(WIFEXITED(status))
-            {
-                int exit_status = WEXITSTATUS(status);
-                if(exit_status == 0)
-                {
-                    fprintf(stdout, "Child process %d exited successfully\n", pid);
-                }
-                else
-                {
-                    fprintf(stderr, "Child process %d exited with status %d\n",pid, exit_status);
-                }
-            }
+            printf("Kill server request received\n");
+            kill_signal_received = 1;
+            printf("Kill signal value: %d\n", kill_signal_received);
+            kill(getpid(), SIGINT);
             exit(EXIT_SUCCESS);
         }
+
+            pid_t pid = fork();
+            if(pid < 0)
+            {
+                perror("Fork failed");
+                exit(EXIT_FAILURE);
+            }
+            else if(pid == 0)
+            {
+                if(request.operation_type == NONE)
+                {
+                    enqueue(waiting_list, request.client_pid);
+                    int client_fd2;
+                    char client_fifo2[CLIENT_FIFO_NAME_LEN];
+                    snprintf(client_fifo2, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_TEMPLATE, request.client_pid);
+                    if((client_fd2 = open(client_fifo2, O_WRONLY)) == -1)
+                    {
+                        fprintf(stderr, "Error opening client FIFO: %s (errno=%d)\n", strerror(errno), errno);
+                        exit(EXIT_FAILURE);
+                    }
+                    else
+                    {
+                        fprintf(stdout, "Client FIFO2 opened: %d\n", client_fd2);
+                    }
+                    if(kill_signal_received == 1)
+                    {
+                        exit(EXIT_SUCCESS);
+                    }
+                    send_response(SUCCESS, "Connecteeeeeed.\n", client_fd2, request.client_pid);
+                }
+                else if(request.operation_type == KILL_SERVER)
+                {
+                    printf("Kill server request received\n");
+                    kill_signal_received = 1;
+                    printf("Kill signal value: %d\n", kill_signal_received);
+                    kill_parent_and_children(getppid());
+                    exit(EXIT_SUCCESS);
+                }
+                else
+                {
+                    handle_request(request, waiting_list, connected_list, dirname, max_clients);
+                    exit(EXIT_SUCCESS);
+                }
+    
+            }
+            else 
+            {
+                //Parent process
+                int status;
+                waitpid(pid, &status, 0);
+                if(WIFEXITED(status))
+                {
+                    int exit_status = WEXITSTATUS(status);
+                    if(exit_status == 0)
+                    {
+                        fprintf(stdout, "Child process %d exited successfully\n", pid);
+                    }
+                    else
+                    {
+                        fprintf(stderr, "Child process %d exited with status %d\n",pid, exit_status);
+                    }
+                }
+                else
+                {
+                    fprintf(stderr, "Child process %d terminated abnormally\n", pid);
+                }
+                printf("Kill signal received: %d\n", kill_signal_received);
+                if(kill_signal_received==1)
+                {
+                    exit(EXIT_SUCCESS);
+                }
+            }
+        
     }
     exit(EXIT_SUCCESS);
 }
