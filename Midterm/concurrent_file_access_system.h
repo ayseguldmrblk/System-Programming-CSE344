@@ -67,7 +67,7 @@ typedef struct response_t
 } response_t;
 
 char* help_available_operations();
-char* help_for_operation(operation_type_t operation);
+char* help_for_operation(char* commandAsked);
 
 int send_response(response_status_t status, const char *body, int client_fd, pid_t client_pid)
 {

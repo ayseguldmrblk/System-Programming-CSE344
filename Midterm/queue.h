@@ -178,7 +178,7 @@ int is_client_in_queue(queue_t *queue, int client_pid)
 {
     if(is_empty(queue))
     {
-        fprintf(stderr, "Queue is empty\n");
+        fprintf(stderr, "Queue is emptyyyyy\n");
         return 0;
     }
 

@@ -29,45 +29,54 @@ char* help_available_operations()
            "help, list, readF, writeT, upload, download, archServer, quit, killServer \n";
 }
 
-char* help_for_operation(operation_type_t operation)
+char* help_for_operation(char* commandAsked)
 {
-    switch(operation)
+    if(strcmp(commandAsked, "help") == 0)
     {
-        case HELP:
-            return "Display the list of possible client requests.\n";
-
-        case LIST:
-            return "Sends a request to display the list of files in Server's directory. (Also displays the list received from the Server)\n";
-
-        case READ_FILE:
-            return "readF <file> <line #> \n"
-                     "requests to display the # line of the <file>, if no line number is given the whole contents of the file is requested (and displayed on the client side) \n";
-
-        case WRITE_FILE:
-            return "writeT <file> <line #> <string>\n"
-                    "Request to write the content of “string” to the #th line the <file>, if the line # is not given writes to the end of file. If the file does not exists in Servers directory creates and edits the file at the same time.\n";
-
-        case UPLOAD:
-            return "upload <file>\n"
-                    "Uploads the file from the current working directory of client to the Server's directory. (Beware of the cases no file in clients current working directory  and  file with the same name on Server's side)\n";
-
-        case DOWNLOAD:
-            return "download <file>\n"
-                    "Request to receive <file> from Server's directory to client side.\n";
-
-        case ARCHIVE_SERVER:
-            return "archServer <fileName>.tar\n"
-                    "Using fork, exec and tar utilities create a child process that will collect all the files currently available on the the Server side and store them in the <filename>.tar archive.\n";
-
-        case KILL_SERVER:
-            return "killServer\n"
-                    "Sends a kill request to the Server\n";
-
-        case QUIT:
-            return "quit\n"
-                    "Send write request to Server side log file and quits.\n";
-        default:
-            return "Invalid operation\n";
+        return "Display the list of possible client requests.\n";
+    }
+    else if(strcmp(commandAsked, "list") == 0)
+    {
+        return "Sends a request to display the list of files in Server's directory. (Also displays the list received from the Server)\n";
+    }
+    else if(strcmp(commandAsked, "readF") == 0)
+    {
+        return "readF <file> <line #> \n"
+               "requests to display the # line of the <file>, if no line number is given the whole contents of the file is requested (and displayed on the client side) \n";
+    }
+    else if(strcmp(commandAsked, "writeT") == 0)
+    {
+        return "writeT <file> <line #> <string>\n"
+               "Request to write the content of “string” to the #th line the <file>, if the line # is not given writes to the end of file. If the file does not exists in Servers directory creates and edits the file at the same time.\n";
+    }
+    else if(strcmp(commandAsked, "upload") == 0)
+    {
+        return "upload <file>\n"
+               "Uploads the file from the current working directory of client to the Server's directory. (Beware of the cases no file in clients current working directory  and  file with the same name on Server's side)\n";
+    }
+    else if(strcmp(commandAsked, "download") == 0)
+    {
+        return "download <file>\n"
+               "Request to receive <file> from Server's directory to client side.\n";
+    }
+    else if(strcmp(commandAsked, "archServer") == 0)
+    {
+        return "archServer <fileName>.tar\n"
+               "Using fork, exec and tar utilities create a child process that will collect all the files currently available on the the Server side and store them in the <filename>.tar archive.\n";
+    }
+    else if(strcmp(commandAsked, "killServer") == 0)
+    {
+        return "killServer\n"
+               "Sends a kill request to the Server\n";
+    }
+    else if(strcmp(commandAsked, "quit") == 0)
+    {
+        return "quit\n"
+               "Send write request to Server side log file";
+    }
+    else
+    {
+        return "Invalid command\n";
     }
 }
 
@@ -273,6 +282,7 @@ int upload_file(const char* filename, const char* server_dir)
 
 int download_file(const char* filename, const char* server_dir) 
 {
+    printf("In download_file\n");
     // Check if the file exists in the server directory
     char server_filename[256];
     snprintf(server_filename, sizeof(server_filename), "%s/%s", server_dir, filename);
@@ -400,16 +410,6 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
     char *file_content = NULL;
     int status = -2;
 
-    switch(request.operation_type)
-    {
-        case HELP:
-            send_response(SUCCESS, "aysegul", client_fd, request.client_pid);
-            break;
-        defult:
-            send_response(FAILURE, "Invalid operation\n", client_fd, request.client_pid);
-            break;
-    }
-/*
     if(request.connection_type == CONNECT && request.operation_type == NONE)
     {
         if(connected_list->size == max_clients)
@@ -444,14 +444,13 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
             send_response(SUCCESS, "Connected to server.\n", client_fd, request.client_pid);
         }
     }
-    else if(is_client_in_queue(connected_list, request.client_pid == 1))
-    {
+
         switch (request.operation_type)
         {
             case HELP:
                 if(strcmp(request.command.filename, "") != 0)
                 {
-                    send_response(SUCCESS, help_for_operation(request.operation_type), client_fd, request.client_pid);
+                    send_response(SUCCESS, help_for_operation(request.command.filename), client_fd, request.client_pid);
                 }
                 else
                 {
@@ -550,8 +549,7 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
             default:
                 break;
         }
-    }
-*/
+    
 }
 
 int main(int argc, char *argv[])
@@ -639,7 +637,6 @@ int main(int argc, char *argv[])
     while(1)
     {
 
-        /*
         // Check if connected clients have plots available
         if (!is_empty(connected_list) && !is_empty(waiting_list))
         {
@@ -666,7 +663,6 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        */
 
         ssize_t bytes_read;
         while ((bytes_read = read(server_fd, &request, sizeof(request_t))) == -1) 
@@ -686,8 +682,6 @@ int main(int argc, char *argv[])
         }
 
 
-
-
         pid_t pid = fork();
         if(pid < 0)
         {
@@ -696,10 +690,28 @@ int main(int argc, char *argv[])
         }
         else if(pid == 0)
         {
-
-
-            handle_request(request, waiting_list, connected_list, dirname, max_clients);
-            exit(EXIT_SUCCESS);
+            if(request.operation_type == NONE)
+            {
+                enqueue(waiting_list, request.client_pid);
+                int client_fd2;
+                char client_fifo2[CLIENT_FIFO_NAME_LEN];
+                snprintf(client_fifo2, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_TEMPLATE, request.client_pid);
+                if((client_fd2 = open(client_fifo2, O_WRONLY)) == -1)
+                {
+                    fprintf(stderr, "Error opening client FIFO: %s (errno=%d)\n", strerror(errno), errno);
+                    exit(EXIT_FAILURE);
+                }
+                else
+                {
+                    fprintf(stdout, "Client FIFO2 opened: %d\n", client_fd2);
+                }
+                send_response(SUCCESS, "Connecteeeeeed.\n", client_fd2, request.client_pid);
+            }
+            else 
+            {
+                handle_request(request, waiting_list, connected_list, dirname, max_clients);
+                exit(EXIT_SUCCESS);
+            }
         }
         else 
         {

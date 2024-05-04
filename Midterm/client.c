@@ -83,12 +83,8 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Error reading from client FIFO: %s (errno=%d)\n", strerror(errno), errno);
             exit(EXIT_FAILURE);
         }
-        else
-        {
-            
-            fprintf(stdout, "Response from server: %s", response.body);
-        }
        
+        
         if(response.status == SUCCESS)
         {
             while(1)
