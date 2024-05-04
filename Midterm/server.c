@@ -382,12 +382,10 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
     printf("In handle_request\n");
     char log[100];
     int client_fd;
-    int client_server_fd;
-    char client_fifo[CLIENT_FIFO_NAME_LEN], client_server_fifo[CLIENT_FIFO_NAME_LEN];
-    snprintf(client_fifo,CLIENT_FIFO_NAME_LEN,CLIENT_FIFO_TEMPLATE,request.client_pid);
-    snprintf(client_server_fifo,SERVER_CLIENT_FIFO_NAME_LEN,SERVER_CLIENT_FIFO_TEMPLATE, get_pid());
+    char client_fifo[CLIENT_FIFO_NAME_LEN];
     printf("Client %d requested operation %d\n", request.client_pid, request.operation_type);
 
+    snprintf(client_fifo, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_TEMPLATE, request.client_pid);
     if((client_fd = open(client_fifo, O_WRONLY)) == -1)
     {
         fprintf(stderr, "Error opening client FIFO: %s (errno=%d)\n", strerror(errno), errno);
@@ -397,41 +395,21 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
     {
         fprintf(stdout, "Client FIFO opened: %d\n", client_fd);
     }
-    if(mkfifo(client_server_fifo, 0666) == -1)
-    {
-        fprintf(stderr, "Error creating client FIFO: %s (errno=%d)\n", strerror(errno), errno);
-        exit(EXIT_FAILURE);
-    }
-    else
-    {
-        fprintf(stdout, "Client FIFO created.\n");
-    }
-    if(mkfifo(client_server_fifo, 0666) == -1)
-    {
-        fprintf(stderr, "Error creating client FIFO: %s (errno=%d)\n", strerror(errno), errno);
-        exit(EXIT_FAILURE);
-    }
-    else
-    {
-        fprintf(stdout, "Client_Server FIFO created.\n");
-    }
 
-    if((client_server_fd = open(client_server_fifo, O_RDONLY)) == -1)
-    {
-        fprintf(stderr, "Error opening client FIFO: %s (errno=%d)\n", strerror(errno), errno);
-        exit(EXIT_FAILURE);
-    }
-    else
-    {
-        fprintf(stdout, "Client_Server FIFO opened: %d\n", client_server_fd);
-    }
-    send_response(SUCCESS, "Server client fifo created\n", client_server_fd, getpid());
-
-    /*
     char *file_list = NULL;
     char *file_content = NULL;
     int status = -2;
 
+    switch(request.operation_type)
+    {
+        case HELP:
+            send_response(SUCCESS, "aysegul", client_fd, request.client_pid);
+            break;
+        defult:
+            send_response(FAILURE, "Invalid operation\n", client_fd, request.client_pid);
+            break;
+    }
+/*
     if(request.connection_type == CONNECT && request.operation_type == NONE)
     {
         if(connected_list->size == max_clients)
@@ -573,7 +551,7 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
                 break;
         }
     }
-    */
+*/
 }
 
 int main(int argc, char *argv[])
@@ -582,6 +560,7 @@ int main(int argc, char *argv[])
     int client_fd = 0;
     char server_fifo[100];
     request_t request; 
+    response_t connction_response;
     queue_t *waiting_list = create_queue();
     queue_t *connected_list = create_queue();
     char *dirname = NULL;
@@ -706,6 +685,9 @@ int main(int argc, char *argv[])
             }
         }
 
+
+
+
         pid_t pid = fork();
         if(pid < 0)
         {
@@ -714,8 +696,10 @@ int main(int argc, char *argv[])
         }
         else if(pid == 0)
         {
-            printf("In child process\n");
+
+
             handle_request(request, waiting_list, connected_list, dirname, max_clients);
+            exit(EXIT_SUCCESS);
         }
         else 
         {

@@ -15,7 +15,6 @@ int main(int argc, char *argv[])
     int server_fifo_fd;
     char message[100];
     char client_fifo[CLIENT_FIFO_NAME_LEN];
-    char server_client_fifo[SERVER_CLIENT_FIFO_NAME_LEN];
 
     if(signal(SIGINT, signal_handler) == SIG_ERR)
     {
