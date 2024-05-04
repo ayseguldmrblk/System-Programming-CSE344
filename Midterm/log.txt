@@ -10,3 +10,8 @@ Client 12100 received SIGINT.
 Client 12952 received SIGINT.
 Client 13399 received SIGINT.
 Client 17453 received SIGINT.
+Client 19768 received SIGINT.
+Client 21039 received SIGINT.
+Client 23028 received SIGINT.
+Client 24181 received SIGINT.
+Client 24468 received SIGINT.

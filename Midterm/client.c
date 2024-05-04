@@ -104,6 +104,10 @@ int main(int argc, char *argv[])
                 }
                 else 
                 {
+                    if(command.operation_type == KILL_SERVER)
+                    {
+                        send_request(getpid(), connect_type, command.operation_type, command, server_fifo_fd);
+                    }
                     send_request(getpid(), connect_type, command.operation_type, command, server_fifo_fd);
                 }
 

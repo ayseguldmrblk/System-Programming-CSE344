@@ -642,7 +642,14 @@ int main(int argc, char *argv[])
 
     while(1)
     {
-
+        if(request.operation_type == KILL_SERVER)
+        {
+            printf("Kill server request received\n");
+            // Directly initiate shutdown sequence
+            unlink(server_fifo); // Remove the server FIFO to clean up
+            exit(EXIT_SUCCESS);  // Exit directly
+        }
+        /*
         // Check if connected clients have plots available
         if (!is_empty(connected_list) && !is_empty(waiting_list))
         {
@@ -669,7 +676,7 @@ int main(int argc, char *argv[])
                 }
             }
         }
-
+        */
         ssize_t bytes_read;
         while ((bytes_read = read(server_fd, &request, sizeof(request_t))) == -1) 
         {
@@ -691,10 +698,9 @@ int main(int argc, char *argv[])
         if(request.operation_type == KILL_SERVER)
         {
             printf("Kill server request received\n");
-            kill_signal_received = 1;
-            printf("Kill signal value: %d\n", kill_signal_received);
-            kill(getpid(), SIGINT);
-            exit(EXIT_SUCCESS);
+            // Directly initiate shutdown sequence
+            unlink(server_fifo); // Remove the server FIFO to clean up
+            exit(EXIT_SUCCESS);  // Exit directly
         }
 
             pid_t pid = fork();
@@ -743,6 +749,10 @@ int main(int argc, char *argv[])
             }
             else 
             {
+                if(kill_signal_received==1)
+                {
+                    kill_parent_and_children(getpid());
+                }
                 //Parent process
                 int status;
                 waitpid(pid, &status, 0);
@@ -762,11 +772,7 @@ int main(int argc, char *argv[])
                 {
                     fprintf(stderr, "Child process %d terminated abnormally\n", pid);
                 }
-                printf("Kill signal received: %d\n", kill_signal_received);
-                if(kill_signal_received==1)
-                {
-                    exit(EXIT_SUCCESS);
-                }
+                
             }
         
     }
