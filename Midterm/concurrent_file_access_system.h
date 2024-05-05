@@ -167,6 +167,7 @@ command_t parse_command(char *input)
     //write
     } else if (strcmp(token, "writeT") == 0) 
     {
+        printf("Input: %s\n", input);
         command.operation_type = WRITE_FILE;
         // <file>
         token = strtok(NULL, " ");
@@ -175,13 +176,21 @@ command_t parse_command(char *input)
             strcpy(command.filename, token);
         }
         // <line #>
-        token = strtok(NULL, "");
+        token = strtok(NULL, " ");
         if (token != NULL) 
         {
-            command.line = atoi(token);
+            printf("Line: %s\n", token);
+            char *endptr;
+            command.line = strtol(token, &endptr, 10);
+            if (*endptr != '\0') 
+            {
+                // Error handling if conversion fails
+                printf("Invalid line number\n");
+                // Handle error appropriately, e.g., return an error code or exit
+            }
         }
         // <string>
-        token = strtok(NULL, "");
+        token = strtok(NULL, "\n"); // Use "\n" to capture the rest of the line including spaces
         if (token != NULL) 
         {
             printf("In parse_command: %s\n", token);
