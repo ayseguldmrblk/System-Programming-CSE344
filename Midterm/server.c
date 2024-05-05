@@ -501,10 +501,6 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
                     }
                 break;
             case WRITE_FILE:
-                    printf("In WRITE_FILE\n");
-                    printf("Filename: %s\n", request.command.filename);
-                    printf("Line number: %d\n", request.command.line);
-                    printf("Data: %s\n", request.command.data);
                     if (write_to_file(request.command.filename, request.command.line, request.command.data) == 0) 
                     {
                         send_response(SUCCESS, "File written successfully\n", client_fd, request.client_pid);
@@ -515,12 +511,15 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
                     }
                 break;
             case UPLOAD:
+                    print("In upload\n");
                     if (upload_file(request.command.filename, dirname) == 0) 
                     {
+                        print("File uploaded successfully\n");
                         send_response(SUCCESS, "File uploaded successfully\n", client_fd, request.client_pid);
                     } 
                     else 
                     {
+                        print("Error uploading file\n");
                         send_response(FAILURE, "Error uploading file\n", client_fd, request.client_pid);
                     }
                 break;

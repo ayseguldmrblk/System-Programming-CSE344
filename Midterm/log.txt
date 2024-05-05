@@ -21,3 +21,6 @@ Client 57314 received SIGINT.
 Client 59839 received SIGINT.
 Client 61471 received SIGINT.
 Client 65489 received SIGINT.
+Client 66563 received SIGINT.
+Client 68973 received SIGINT.
+Client 69670 received SIGINT.

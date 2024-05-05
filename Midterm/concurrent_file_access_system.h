@@ -167,7 +167,6 @@ command_t parse_command(char *input)
     //write
     } else if (strcmp(token, "writeT") == 0) 
     {
-        printf("Input: %s\n", input);
         command.operation_type = WRITE_FILE;
         // <file>
         token = strtok(NULL, " ");
@@ -193,12 +192,7 @@ command_t parse_command(char *input)
         token = strtok(NULL, "\n"); // Use "\n" to capture the rest of the line including spaces
         if (token != NULL) 
         {
-            printf("In parse_command: %s\n", token);
             strcpy(command.data, token);
-        }
-        else
-        {
-            printf("In parse_command: %s\n", "No data");
         }
     // upload 
     } else if (strcmp(token, "upload") == 0) 
@@ -208,6 +202,7 @@ command_t parse_command(char *input)
         token = strtok(NULL, " ");
         if (token != NULL) 
         {
+            printf("File: %s\n", token);
             strcpy(command.filename, token);
         }
     // download
