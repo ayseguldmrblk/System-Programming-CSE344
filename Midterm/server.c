@@ -241,18 +241,13 @@ int write_to_file(const char* filename, int line_number, const char* content)
 
 int upload_file(const char* filename, const char* client_dir, const char* server_dir) 
 {
-    printf("In upload_file\n");
-    printf("Filename: %s\n", filename);
-    printf("Client directory: %s\n", client_dir);
-    printf("Server directory: %s\n", server_dir);
-
     // Construct the full path of the file in the client directory
-    char client_filename[256];
+    char client_filename[MAX_FILENAME_LEN];
     snprintf(client_filename, sizeof(client_filename), "%s/%s", client_dir, filename);
 
     // Construct the full path of the file in the server directory
-    char server_filename[256];
-    snprintf(server_filename, sizeof(server_filename), "%s/%s", server_dir, filename);
+    char server_filename[MAX_FILENAME_LEN];
+    snprintf(server_filename, sizeof(server_filename), "%s", filename);
 
     // Check if the file already exists in the server directory
     if (access(server_filename, F_OK) != -1) 
@@ -262,62 +257,62 @@ int upload_file(const char* filename, const char* client_dir, const char* server
     }
 
     // Open the file in read mode from the client directory
-    FILE* file = fopen(client_filename, "r");
-    if (file == NULL) 
+    int file = open(client_filename, O_RDONLY);
+    if (file == -1) 
     {
         fprintf(stderr, "Error opening file: %s (errno=%d)\n", strerror(errno), errno);
         return -1; // Error opening file
     }
 
     // Determine the size of the file
-    fseek(file, 0, SEEK_END);
-    long file_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    printf("File size: %ld\n", file_size);
+    off_t file_size = lseek(file, 0, SEEK_END);
+    lseek(file, 0, SEEK_SET);
+    printf("File size: %ld\n", (long)file_size);
 
     // Allocate memory to store the file content
-    char* file_content = (char*)malloc(file_size + 1);
+    char* file_content = (char*)malloc(file_size);
     if (file_content == NULL) 
     {
         printf("Memory allocation failed.\n");
-        fclose(file);
+        close(file);
         return -1; // Memory allocation failed
     }
 
     // Read the file content into memory
-    if (fread(file_content, 1, file_size, file) != file_size) 
+    ssize_t bytes_read = read(file, file_content, file_size);
+    if (bytes_read != file_size) 
     {
         printf("Error reading file.\n");
-        fclose(file);
+        close(file);
         free(file_content);
         return -1; // Error reading file
     }
-    file_content[file_size] = '\0'; // Null-terminate the string
     printf("File content: %s\n", file_content);
 
     // Close the file
-    fclose(file);
+    close(file);
 
-    // Open the file in the server's directory for writing
-    FILE* server_file = fopen(server_filename, "a+");
-    if (server_file == NULL) 
+    // Open the file in write mode in the server directory
+    int server_file = open(server_filename, O_WRONLY | O_CREAT, 0666);
+    if (server_file == -1) 
     {
-        perror("Error opening server file.\n");
+        fprintf(stderr, "Error opening server file: %s (errno=%d)\n", strerror(errno), errno);
         free(file_content);
         return -1; // Error opening server file
     }
 
     // Write the file content to the server's file
-    if (fwrite(file_content, 1, file_size, server_file) != file_size) 
+    ssize_t bytes_written = write(server_file, file_content, file_size);
+    if (bytes_written != file_size) 
     {
         printf("Error writing to server file.\n");
-        fclose(server_file);
+        close(server_file);
         free(file_content);
         return -1; // Error writing to server file
     }
 
     // Close the server file
-    fclose(server_file);
+    close(server_file);
 
     // Free the memory allocated for file content
     free(file_content);
@@ -330,15 +325,17 @@ int download_file(const char* filename, const char* server_dir)
     printf("In download_file\n");
     // Check if the file exists in the server directory
     char server_filename[256];
-    snprintf(server_filename, sizeof(server_filename), "%s/%s", server_dir, filename);
+    snprintf(server_filename, sizeof(server_filename), "%s", filename);
     if (access(server_filename, F_OK) == -1) 
     {
+        fprintf(stderr, "File does not exist in the server directory: %s\n", server_filename);
         return -1; // File does not exist in the server directory
     }
 
     FILE* server_file = fopen(server_filename, "r");
     if (server_file == NULL) 
     {
+        fprintf(stderr, "Error opening server file: %s\n", strerror(errno));
         return -1; // Error opening server file
     }
 
@@ -351,6 +348,7 @@ int download_file(const char* filename, const char* server_dir)
     char* file_content = (char*)malloc(file_size + 1);
     if (file_content == NULL) 
     {
+        fprintf(stderr, "Memory allocation failed.\n");
         fclose(server_file);
         return -1; // Memory allocation failed
     }
@@ -358,6 +356,7 @@ int download_file(const char* filename, const char* server_dir)
     // Read the file content from the server file
     if (fread(file_content, 1, file_size, server_file) != file_size) 
     {
+        fprintf(stderr, "Error reading server file.\n");
         fclose(server_file);
         free(file_content);
         return -1; // Error reading server file
@@ -376,6 +375,7 @@ int download_file(const char* filename, const char* server_dir)
 
     // Write the file content to the local file
     if (fwrite(file_content, 1, file_size, file) != file_size) {
+        fprintf(stderr, "Error writing to local file.\n");
         fclose(file);
         free(file_content);
         return -1; // Error writing to local file

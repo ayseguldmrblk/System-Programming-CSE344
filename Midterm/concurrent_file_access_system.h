@@ -15,6 +15,7 @@
 #define CLIENT_FIFO_TEMPLATE "/tmp/client_fifo.%d"
 #define CLIENT_FIFO_NAME_LEN (sizeof(CLIENT_FIFO_TEMPLATE) + 20)
 #define MAX_LINE_LENGTH 1000
+#define MAX_FILENAME_LEN 256
 
 typedef enum 
 {
