@@ -239,20 +239,33 @@ int write_to_file(const char* filename, int line_number, const char* content)
     return 0; 
 }
 
-int upload_file(const char* filename, const char* server_dir) 
+int upload_file(const char* filename, const char* client_dir, const char* server_dir) 
 {
-    // Check if the file already exists in the server directory
+    printf("In upload_file\n");
+    printf("Filename: %s\n", filename);
+    printf("Client directory: %s\n", client_dir);
+    printf("Server directory: %s\n", server_dir);
+
+    // Construct the full path of the file in the client directory
+    char client_filename[256];
+    snprintf(client_filename, sizeof(client_filename), "%s/%s", client_dir, filename);
+
+    // Construct the full path of the file in the server directory
     char server_filename[256];
     snprintf(server_filename, sizeof(server_filename), "%s/%s", server_dir, filename);
+
+    // Check if the file already exists in the server directory
     if (access(server_filename, F_OK) != -1) 
     {
+        printf("File with the same name already exists in the server directory.\n");
         return -1; // File with the same name already exists in the server directory
     }
 
-    // Open the file in read mode
-    FILE* file = fopen(filename, "r");
+    // Open the file in read mode from the client directory
+    FILE* file = fopen(client_filename, "r");
     if (file == NULL) 
     {
+        fprintf(stderr, "Error opening file: %s (errno=%d)\n", strerror(errno), errno);
         return -1; // Error opening file
     }
 
@@ -260,11 +273,13 @@ int upload_file(const char* filename, const char* server_dir)
     fseek(file, 0, SEEK_END);
     long file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
+    printf("File size: %ld\n", file_size);
 
     // Allocate memory to store the file content
     char* file_content = (char*)malloc(file_size + 1);
     if (file_content == NULL) 
     {
+        printf("Memory allocation failed.\n");
         fclose(file);
         return -1; // Memory allocation failed
     }
@@ -272,19 +287,22 @@ int upload_file(const char* filename, const char* server_dir)
     // Read the file content into memory
     if (fread(file_content, 1, file_size, file) != file_size) 
     {
+        printf("Error reading file.\n");
         fclose(file);
         free(file_content);
         return -1; // Error reading file
     }
     file_content[file_size] = '\0'; // Null-terminate the string
+    printf("File content: %s\n", file_content);
 
     // Close the file
     fclose(file);
 
     // Open the file in the server's directory for writing
-    FILE* server_file = fopen(server_filename, "w");
+    FILE* server_file = fopen(server_filename, "a+");
     if (server_file == NULL) 
     {
+        perror("Error opening server file.\n");
         free(file_content);
         return -1; // Error opening server file
     }
@@ -292,6 +310,7 @@ int upload_file(const char* filename, const char* server_dir)
     // Write the file content to the server's file
     if (fwrite(file_content, 1, file_size, server_file) != file_size) 
     {
+        printf("Error writing to server file.\n");
         fclose(server_file);
         free(file_content);
         return -1; // Error writing to server file
@@ -511,15 +530,14 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
                     }
                 break;
             case UPLOAD:
-                    print("In upload\n");
-                    if (upload_file(request.command.filename, dirname) == 0) 
+                    printf("client dir: %s\n", request.command.data);
+                    printf("dirname: %s\n", dirname);
+                    if (upload_file(request.command.filename, request.command.data, dirname) == 0) 
                     {
-                        print("File uploaded successfully\n");
                         send_response(SUCCESS, "File uploaded successfully\n", client_fd, request.client_pid);
                     } 
                     else 
                     {
-                        print("Error uploading file\n");
                         send_response(FAILURE, "Error uploading file\n", client_fd, request.client_pid);
                     }
                 break;

@@ -42,7 +42,7 @@ typedef struct command_t
     operation_type_t operation_type;
     char filename[100];
     int line;
-    char data[100];
+    char data[256];
 } command_t;
 
 typedef struct request_t
@@ -197,6 +197,7 @@ command_t parse_command(char *input)
     // upload 
     } else if (strcmp(token, "upload") == 0) 
     {
+        char cwd[256];
         command.operation_type = UPLOAD;
         // <file>
         token = strtok(NULL, " ");
@@ -204,6 +205,16 @@ command_t parse_command(char *input)
         {
             printf("File: %s\n", token);
             strcpy(command.filename, token);
+        }
+        
+        if (getcwd(cwd, sizeof(cwd)) != NULL) 
+        {
+            printf("Current working directory: %s\n", cwd);
+            strcpy(command.data, cwd);
+        } 
+        else 
+        {
+            perror("getcwd() error");
         }
     // download
     } else if (strcmp(token, "download") == 0) 
