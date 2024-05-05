@@ -15,3 +15,5 @@ Client 21039 received SIGINT.
 Client 23028 received SIGINT.
 Client 24181 received SIGINT.
 Client 24468 received SIGINT.
+Client 52245 received SIGINT.
+Client 54380 received SIGINT.

@@ -184,7 +184,12 @@ command_t parse_command(char *input)
         token = strtok(NULL, "");
         if (token != NULL) 
         {
+            printf("In parse_command: %s\n", token);
             strcpy(command.data, token);
+        }
+        else
+        {
+            printf("In parse_command: %s\n", "No data");
         }
     // upload 
     } else if (strcmp(token, "upload") == 0) 
