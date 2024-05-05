@@ -387,7 +387,7 @@ int download_file(const char* filename, const char* server_dir)
     return 0; // Success
 }
 
-int archive_server(const char* filename, const char* server_dir) 
+int archive_server(const char* filename, const char* dir) 
 {
     pid_t pid = fork(); // Fork a child process
     if (pid < 0) {
@@ -397,13 +397,14 @@ int archive_server(const char* filename, const char* server_dir)
     {
         // Child process
         // Change working directory to the server directory
-        if (chdir(server_dir) == -1) 
+        printf("Server dir: %s\n", dir);
+        if (chdir(dir) == -1) 
         {
             perror("Error changing directory");
             exit(EXIT_FAILURE);
         }
         // Execute tar command to create the archive
-        execlp("tar", "tar", "-cf", filename, ".", NULL);
+        execlp("tar", "tar", "-czf", filename, ".", NULL);
         // If exec returns, it failed
         perror("Exec failed");
         exit(EXIT_FAILURE);
@@ -552,7 +553,7 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
                     }
                 break;
             case ARCHIVE_SERVER:
-                    status = archive_server(request.command.filename, dirname);
+                    status = archive_server(request.command.filename, request.command.data);
                     if (status == 0) 
                     {
                         send_response(SUCCESS, "Server archived successfully.\n", client_fd, request.client_pid);

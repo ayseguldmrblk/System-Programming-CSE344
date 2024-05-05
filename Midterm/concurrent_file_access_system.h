@@ -127,6 +127,7 @@ char* int_to_str(int num)
 command_t parse_command(char *input) 
 {
     command_t command;
+    char cwd[256];
     memset(&command, 0, sizeof(command)); // Initialize command struct to zero
     snprintf(command.filename, sizeof(command.filename), "%s", ""); // Initialize filename to empty string
     command.line = -1;
@@ -198,7 +199,6 @@ command_t parse_command(char *input)
     // upload 
     } else if (strcmp(token, "upload") == 0) 
     {
-        char cwd[256];
         command.operation_type = UPLOAD;
         // <file>
         token = strtok(NULL, " ");
@@ -237,6 +237,17 @@ command_t parse_command(char *input)
         {
             strcpy(command.filename, token);
         }
+        // dir to archive
+                if (getcwd(cwd, sizeof(cwd)) != NULL) 
+        {
+            printf("Current working directory: %s\n", cwd);
+            strcpy(command.data, cwd);
+        } 
+        else 
+        {
+            perror("getcwd() error");
+        }
+
     // killServer
     } else if (strcmp(token, "killServer") == 0) 
     {
