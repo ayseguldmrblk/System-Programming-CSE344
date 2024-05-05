@@ -89,6 +89,7 @@ int send_response(response_status_t status, const char *body, int client_fd, pid
     return 0;
 }
 
+
 int send_request(pid_t client_pid, connection_type_t connection_type, operation_type_t operation_type, command_t command, int server_fifo_fd)
 {
     request_t request;
@@ -101,10 +102,6 @@ int send_request(pid_t client_pid, connection_type_t connection_type, operation_
     {
         fprintf(stderr, "Error writing to server FIFO: %s (errno=%d)\n", strerror(errno), errno);
         return -1;
-    }
-    else
-    {
-        fprintf(stdout, "Request sent to server\n");
     }
 
     return 0;
@@ -283,7 +280,8 @@ int print(const char *message)
 }
 
 // Function to log a message to the log file
-void log_message(const char* message) {
+void log_message(const char* message) 
+{
     // Open the log file
     int log_fd = open(LOG_FILE, O_WRONLY | O_CREAT | O_APPEND, 0666);
     if (log_fd == -1) {
@@ -297,7 +295,8 @@ void log_message(const char* message) {
     fl.l_whence = SEEK_SET;
     fl.l_start = 0;
     fl.l_len = 0;
-    if (fcntl(log_fd, F_SETLKW, &fl) == -1) {
+    if (fcntl(log_fd, F_SETLKW, &fl) == -1) 
+    {
         perror("Error acquiring lock on log file");
         close(log_fd);
         return;
