@@ -239,66 +239,80 @@ int write_to_file(const char* filename, int line_number, const char* content)
     return 0; 
 }
 
-int upload_file(const char* filename, const char* server_dir) 
+int upload_file(const char* filename, const char* client_dir, const char* server_dir) 
 {
+    // Construct the full path of the file in the client directory
+    char client_filename[MAX_FILENAME_LEN];
+    snprintf(client_filename, sizeof(client_filename), "%s/%s", client_dir, filename);
+
+    // Construct the full path of the file in the server directory
+    char server_filename[MAX_FILENAME_LEN];
+    snprintf(server_filename, sizeof(server_filename), "%s", filename);
+
     // Check if the file already exists in the server directory
-    char server_filename[256];
-    snprintf(server_filename, sizeof(server_filename), "%s/%s", server_dir, filename);
     if (access(server_filename, F_OK) != -1) 
     {
+        printf("File with the same name already exists in the server directory.\n");
         return -1; // File with the same name already exists in the server directory
     }
 
-    // Open the file in read mode
-    FILE* file = fopen(filename, "r");
-    if (file == NULL) 
+    // Open the file in read mode from the client directory
+    int file = open(client_filename, O_RDONLY);
+    if (file == -1) 
     {
+        fprintf(stderr, "Error opening file: %s (errno=%d)\n", strerror(errno), errno);
         return -1; // Error opening file
     }
 
     // Determine the size of the file
-    fseek(file, 0, SEEK_END);
-    long file_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
+    off_t file_size = lseek(file, 0, SEEK_END);
+    lseek(file, 0, SEEK_SET);
+    printf("File size: %ld\n", (long)file_size);
 
     // Allocate memory to store the file content
-    char* file_content = (char*)malloc(file_size + 1);
+    char* file_content = (char*)malloc(file_size);
     if (file_content == NULL) 
     {
-        fclose(file);
+        printf("Memory allocation failed.\n");
+        close(file);
         return -1; // Memory allocation failed
     }
 
     // Read the file content into memory
-    if (fread(file_content, 1, file_size, file) != file_size) 
+    ssize_t bytes_read = read(file, file_content, file_size);
+    if (bytes_read != file_size) 
     {
-        fclose(file);
+        printf("Error reading file.\n");
+        close(file);
         free(file_content);
         return -1; // Error reading file
     }
-    file_content[file_size] = '\0'; // Null-terminate the string
+    printf("File content: %s\n", file_content);
 
     // Close the file
-    fclose(file);
+    close(file);
 
-    // Open the file in the server's directory for writing
-    FILE* server_file = fopen(server_filename, "w");
-    if (server_file == NULL) 
+    // Open the file in write mode in the server directory
+    int server_file = open(server_filename, O_WRONLY | O_CREAT, 0666);
+    if (server_file == -1) 
     {
+        fprintf(stderr, "Error opening server file: %s (errno=%d)\n", strerror(errno), errno);
         free(file_content);
         return -1; // Error opening server file
     }
 
     // Write the file content to the server's file
-    if (fwrite(file_content, 1, file_size, server_file) != file_size) 
+    ssize_t bytes_written = write(server_file, file_content, file_size);
+    if (bytes_written != file_size) 
     {
-        fclose(server_file);
+        printf("Error writing to server file.\n");
+        close(server_file);
         free(file_content);
         return -1; // Error writing to server file
     }
 
     // Close the server file
-    fclose(server_file);
+    close(server_file);
 
     // Free the memory allocated for file content
     free(file_content);
@@ -311,15 +325,17 @@ int download_file(const char* filename, const char* server_dir)
     printf("In download_file\n");
     // Check if the file exists in the server directory
     char server_filename[256];
-    snprintf(server_filename, sizeof(server_filename), "%s/%s", server_dir, filename);
+    snprintf(server_filename, sizeof(server_filename), "%s", filename);
     if (access(server_filename, F_OK) == -1) 
     {
+        fprintf(stderr, "File does not exist in the server directory: %s\n", server_filename);
         return -1; // File does not exist in the server directory
     }
 
     FILE* server_file = fopen(server_filename, "r");
     if (server_file == NULL) 
     {
+        fprintf(stderr, "Error opening server file: %s\n", strerror(errno));
         return -1; // Error opening server file
     }
 
@@ -332,6 +348,7 @@ int download_file(const char* filename, const char* server_dir)
     char* file_content = (char*)malloc(file_size + 1);
     if (file_content == NULL) 
     {
+        fprintf(stderr, "Memory allocation failed.\n");
         fclose(server_file);
         return -1; // Memory allocation failed
     }
@@ -339,6 +356,7 @@ int download_file(const char* filename, const char* server_dir)
     // Read the file content from the server file
     if (fread(file_content, 1, file_size, server_file) != file_size) 
     {
+        fprintf(stderr, "Error reading server file.\n");
         fclose(server_file);
         free(file_content);
         return -1; // Error reading server file
@@ -357,6 +375,7 @@ int download_file(const char* filename, const char* server_dir)
 
     // Write the file content to the local file
     if (fwrite(file_content, 1, file_size, file) != file_size) {
+        fprintf(stderr, "Error writing to local file.\n");
         fclose(file);
         free(file_content);
         return -1; // Error writing to local file
@@ -368,9 +387,9 @@ int download_file(const char* filename, const char* server_dir)
     return 0; // Success
 }
 
-int archive_server(const char* filename, const char* server_dir) 
+int archive_server(const char* filename, const char* dir) 
 {
-    pid_t pid = fork(); // Fork a child process
+    pid_t pid = fork(); 
     if (pid < 0) {
         perror("Fork failed");
         return -1;
@@ -378,13 +397,31 @@ int archive_server(const char* filename, const char* server_dir)
     {
         // Child process
         // Change working directory to the server directory
-        if (chdir(server_dir) == -1) 
+        printf("Server dir: %s\n", dir);
+        if (chdir(dir) == -1) 
         {
             perror("Error changing directory");
             exit(EXIT_FAILURE);
         }
+        
         // Execute tar command to create the archive
+        int dev_null = open("/dev/null", O_WRONLY); 
+        if (dev_null == -1) 
+        {
+            perror("Error opening /dev/null");
+            exit(EXIT_FAILURE);
+        }
+        
+        if (dup2(dev_null, STDERR_FILENO) == -1) {
+            perror("Error redirecting stderr");
+            exit(EXIT_FAILURE);
+        }
+        
+        close(dev_null); 
+        
+        // Execute tar command
         execlp("tar", "tar", "-cf", filename, ".", NULL);
+        
         // If exec returns, it failed
         perror("Exec failed");
         exit(EXIT_FAILURE);
@@ -474,6 +511,8 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
         switch (request.operation_type)
         {
             case HELP:
+                snprintf(log, sizeof(log), "Client %d requested help.\n", request.client_pid);
+                log_message(log);
                 if(strcmp(request.command.filename, "") != 0)
                 {
                     send_response(SUCCESS, help_for_operation(request.command.filename), client_fd, request.client_pid);
@@ -485,11 +524,15 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
                 break;
             case LIST:
                     file_list = list();
+                    snprintf(log, sizeof(log), "Client %d requested list of files.\n", request.client_pid);
+                    log_message(log);
                     send_response(SUCCESS, file_list, client_fd, request.client_pid);
                     free(file_list);
                 break;
             case READ_FILE:
                     file_content = read_file(request.command.filename, request.command.line);
+                    snprintf(log, sizeof(log), "Client %d requested to read file %s.\n", request.client_pid, request.command.filename);
+                    log_message(log);
                     if (file_content != NULL) 
                     {
                         send_response(SUCCESS, file_content, client_fd, request.client_pid);
@@ -501,6 +544,8 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
                     }
                 break;
             case WRITE_FILE:
+                    snprintf(log, sizeof(log), "Client %d requested to write to file %s.\n", request.client_pid, request.command.filename);
+                    log_message(log);
                     if (write_to_file(request.command.filename, request.command.line, request.command.data) == 0) 
                     {
                         send_response(SUCCESS, "File written successfully\n", client_fd, request.client_pid);
@@ -511,7 +556,11 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
                     }
                 break;
             case UPLOAD:
-                    if (upload_file(request.command.filename, dirname) == 0) 
+                    snprintf(log, sizeof(log), "Client %d requested to upload file %s.\n", request.client_pid, request.command.filename);
+                    log_message(log);
+                    printf("client dir: %s\n", request.command.data);
+                    printf("dirname: %s\n", dirname);
+                    if (upload_file(request.command.filename, request.command.data, dirname) == 0) 
                     {
                         send_response(SUCCESS, "File uploaded successfully\n", client_fd, request.client_pid);
                     } 
@@ -521,6 +570,8 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
                     }
                 break;
             case DOWNLOAD:
+                    snprintf(log, sizeof(log), "Client %d requested to download file %s.\n", request.client_pid, request.command.filename);
+                    log_message(log);
                     if (download_file(request.command.filename, dirname) == 0) 
                     {
                         send_response(SUCCESS, "File downloaded successfully\n", client_fd, request.client_pid);
@@ -531,7 +582,9 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
                     }
                 break;
             case ARCHIVE_SERVER:
-                    status = archive_server(request.command.filename, dirname);
+                    snprintf(log, sizeof(log), "Client %d requested to archive server.\n", request.client_pid);
+                    log_message(log);
+                    status = archive_server(request.command.filename, request.command.data);
                     if (status == 0) 
                     {
                         send_response(SUCCESS, "Server archived successfully.\n", client_fd, request.client_pid);
@@ -553,7 +606,6 @@ void handle_request(request_t request, queue_t *waiting_list, queue_t *connected
             default:
                 break;
         }
-    
 }
 
 int main(int argc, char *argv[])
@@ -649,7 +701,6 @@ int main(int argc, char *argv[])
             unlink(server_fifo); // Remove the server FIFO to clean up
             exit(EXIT_SUCCESS);  // Exit directly
         }
-        /*
         // Check if connected clients have plots available
         if (!is_empty(connected_list) && !is_empty(waiting_list))
         {
@@ -676,7 +727,6 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        */
         ssize_t bytes_read;
         while ((bytes_read = read(server_fd, &request, sizeof(request_t))) == -1) 
         {

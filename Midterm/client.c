@@ -121,6 +121,14 @@ int main(int argc, char *argv[])
                 {
                     fprintf(stdout, "%s\n", response.body);
                 }
+                else if(response.status == FAILURE)
+                {
+                    fprintf(stderr, "Operation failed: %s\n", response.body);
+                }
+                else if(response.status == WAIT)
+                {
+                    fprintf(stderr, "%s\n", response.body);
+                }
             }
         }
         else if(response.status == FAILURE)

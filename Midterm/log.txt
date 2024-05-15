@@ -1,17 +1,12 @@
-Client 92649 received SIGINT.
-Client 98586 received SIGINT.
-Client 2654 received SIGINT.
-Client 4480 received SIGINT.
-Client 4931 received SIGINT.
-Client 5502 received SIGINT.
-Client 6986 received SIGINT.
-Client 10847 received SIGINT.
-Client 12100 received SIGINT.
-Client 12952 received SIGINT.
-Client 13399 received SIGINT.
-Client 17453 received SIGINT.
-Client 19768 received SIGINT.
-Client 21039 received SIGINT.
-Client 23028 received SIGINT.
-Client 24181 received SIGINT.
-Client 24468 received SIGINT.
+Server started. PID: 52434
+Client 52506 requested help.
+Client 52506 requested help.
+Client 52566 requested list of files.
+Client 52566 requested to read file log.txt.
+Client 52566 requested to read file log.txt.
+Client 52566 requested to read file log.txt.
+Client 52506 requested to upload file upload_deneme.txt.
+Client 52566 requested to write to file upload_deneme.txt.
+Client 52566 requested to write to file write_deneme.txt.
+Client 52506 requested to download file log.txt.
+Client 52506 requested to download file write_deneme.txt.
