@@ -1,0 +1,12 @@
+Server started. PID: 52434
+Client 52506 requested help.
+Client 52506 requested help.
+Client 52566 requested list of files.
+Client 52566 requested to read file log.txt.
+Client 52566 requested to read file log.txt.
+Client 52566 requested to read file log.txt.
+Client 52506 requested to upload file upload_deneme.txt.
+Client 52566 requested to write to file upload_deneme.txt.
+Client 52566 requested to write to file write_deneme.txt.
+Client 52506 requested to download file log.txt.
+Client 52506 requested to download file write_deneme.txt.

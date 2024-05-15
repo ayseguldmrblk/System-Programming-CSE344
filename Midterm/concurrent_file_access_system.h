@@ -9,11 +9,13 @@
 
 #ifndef CONCURRENT_FILE_ACCESS_SYSTEM_H
 
-#define SERVER_FIFO_TEMPLATE "/tmp/server_fifo_%d"
+#define SERVER_FIFO_TEMPLATE "/tmp/server_fifo.%d"
+#define SERVER_FIFO_NAME_LEN (sizeof(SERVER_FIFO_TEMPLATE) + 20)
 #define LOG_FILE "log.txt"
 #define CLIENT_FIFO_TEMPLATE "/tmp/client_fifo.%d"
 #define CLIENT_FIFO_NAME_LEN (sizeof(CLIENT_FIFO_TEMPLATE) + 20)
 #define MAX_LINE_LENGTH 1000
+#define MAX_FILENAME_LEN 256
 
 typedef enum 
 {
@@ -41,7 +43,7 @@ typedef struct command_t
     operation_type_t operation_type;
     char filename[100];
     int line;
-    char data[100];
+    char data[256];
 } command_t;
 
 typedef struct request_t
@@ -62,11 +64,11 @@ typedef enum
 typedef struct response_t
 {
     response_status_t status;
-    char body[100];
+    char body[400];
 } response_t;
 
 char* help_available_operations();
-char* help_for_operation(operation_type_t operation);
+char* help_for_operation(char* commandAsked);
 
 int send_response(response_status_t status, const char *body, int client_fd, pid_t client_pid)
 {
@@ -87,6 +89,7 @@ int send_response(response_status_t status, const char *body, int client_fd, pid
     return 0;
 }
 
+
 int send_request(pid_t client_pid, connection_type_t connection_type, operation_type_t operation_type, command_t command, int server_fifo_fd)
 {
     request_t request;
@@ -99,10 +102,6 @@ int send_request(pid_t client_pid, connection_type_t connection_type, operation_
     {
         fprintf(stderr, "Error writing to server FIFO: %s (errno=%d)\n", strerror(errno), errno);
         return -1;
-    }
-    else
-    {
-        fprintf(stdout, "Request sent to server\n");
     }
 
     return 0;
@@ -125,6 +124,7 @@ char* int_to_str(int num)
 command_t parse_command(char *input) 
 {
     command_t command;
+    char cwd[256];
     memset(&command, 0, sizeof(command)); // Initialize command struct to zero
     snprintf(command.filename, sizeof(command.filename), "%s", ""); // Initialize filename to empty string
     command.line = -1;
@@ -174,13 +174,21 @@ command_t parse_command(char *input)
             strcpy(command.filename, token);
         }
         // <line #>
-        token = strtok(NULL, "");
+        token = strtok(NULL, " ");
         if (token != NULL) 
         {
-            command.line = atoi(token);
+            printf("Line: %s\n", token);
+            char *endptr;
+            command.line = strtol(token, &endptr, 10);
+            if (*endptr != '\0') 
+            {
+                // Error handling if conversion fails
+                printf("Invalid line number\n");
+                // Handle error appropriately, e.g., return an error code or exit
+            }
         }
         // <string>
-        token = strtok(NULL, "");
+        token = strtok(NULL, "\n"); // Use "\n" to capture the rest of the line including spaces
         if (token != NULL) 
         {
             strcpy(command.data, token);
@@ -193,7 +201,18 @@ command_t parse_command(char *input)
         token = strtok(NULL, " ");
         if (token != NULL) 
         {
+            printf("File: %s\n", token);
             strcpy(command.filename, token);
+        }
+        
+        if (getcwd(cwd, sizeof(cwd)) != NULL) 
+        {
+            printf("Current working directory: %s\n", cwd);
+            strcpy(command.data, cwd);
+        } 
+        else 
+        {
+            perror("getcwd() error");
         }
     // download
     } else if (strcmp(token, "download") == 0) 
@@ -215,6 +234,17 @@ command_t parse_command(char *input)
         {
             strcpy(command.filename, token);
         }
+        // dir to archive
+                if (getcwd(cwd, sizeof(cwd)) != NULL) 
+        {
+            printf("Current working directory: %s\n", cwd);
+            strcpy(command.data, cwd);
+        } 
+        else 
+        {
+            perror("getcwd() error");
+        }
+
     // killServer
     } else if (strcmp(token, "killServer") == 0) 
     {
@@ -250,7 +280,8 @@ int print(const char *message)
 }
 
 // Function to log a message to the log file
-void log_message(const char* message) {
+void log_message(const char* message) 
+{
     // Open the log file
     int log_fd = open(LOG_FILE, O_WRONLY | O_CREAT | O_APPEND, 0666);
     if (log_fd == -1) {
@@ -264,7 +295,8 @@ void log_message(const char* message) {
     fl.l_whence = SEEK_SET;
     fl.l_start = 0;
     fl.l_len = 0;
-    if (fcntl(log_fd, F_SETLKW, &fl) == -1) {
+    if (fcntl(log_fd, F_SETLKW, &fl) == -1) 
+    {
         perror("Error acquiring lock on log file");
         close(log_fd);
         return;

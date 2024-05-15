@@ -5,7 +5,7 @@ OBJFILES_SERVER = server.o
 OBJFILES_CLIENT = client.o
 TARGET_SERVER = neHosServer
 TARGET_CLIENT = neHosClient
-FIFO_FILES = /tmp/server_fifo_* /tmp/client_fifo.*
+FIFO_FILES = /tmp/server_fifo.* /tmp/client_fifo.*
 
 all: $(TARGET_SERVER) $(TARGET_CLIENT)
 
