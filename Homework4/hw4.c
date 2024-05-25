@@ -12,19 +12,18 @@
 #include <limits.h>
 
 typedef struct {
-    int *buffer;
-    int head;
-    int tail;
-    int max_size;
-    int count;
-    int num_regular_files;
-    int num_fifo_files;
-    int num_directories;
-    size_t total_bytes_copied;
-    pthread_mutex_t mutex;
-    pthread_cond_t not_full;
-    pthread_cond_t not_empty;
-    int done;
+    int *buffer;                   // Circular buffer to hold file descriptor pairs (source and destination)
+    int head;                      // Head index for the circular buffer
+    int tail;                      // Tail index for the circular buffer
+    int max_size;                  // Maximum number of file descriptor pairs the buffer can hold
+    int count;                     // Current number of file descriptor pairs in the buffer
+    int num_regular_files;         // Number of regular files processed
+    int num_directories;           // Number of directories processed
+    size_t total_bytes_copied;     // Total number of bytes copied
+    pthread_mutex_t mutex;         // Mutex for synchronizing access to the buffer
+    pthread_cond_t not_full;       // Condition variable to signal when the buffer is not full
+    pthread_cond_t not_empty;      // Condition variable to signal when the buffer is not empty
+    int done;                      // Flag to indicate when the manager is done processing directories
 } buffer_t;
 
 typedef struct {
@@ -35,13 +34,21 @@ typedef struct {
 
 buffer_t *create_buffer(int size) {
     buffer_t *buf = malloc(sizeof(buffer_t));
+    if (!buf) {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
     buf->buffer = malloc(size * 2 * sizeof(int));  // Buffer holds pairs of file descriptors
+    if (!buf->buffer) {
+        perror("malloc");
+        free(buf);
+        exit(EXIT_FAILURE);
+    }
     buf->head = 0;
     buf->tail = 0;
     buf->max_size = size;
     buf->count = 0;
     buf->num_regular_files = 0;
-    buf->num_fifo_files = 0;
     buf->num_directories = 0;
     buf->total_bytes_copied = 0;
     buf->done = 0;
@@ -60,7 +67,7 @@ void cleanup(buffer_t *buffer) {
 }
 
 void handle_signal(int sig) {
-    // Handle signals like SIGINT to terminate gracefully
+    // Handle signal SIGINT 
     fprintf(stderr, "Received signal %d. Terminating gracefully.\n", sig);
     exit(1);
 }
@@ -97,7 +104,7 @@ void process_directory(buffer_t *buffer, const char *src_dir, const char *dest_d
 
             // Recursively process the directory
             process_directory(buffer, src_path, dest_path);
-        } else if (entry->d_type == DT_REG || entry->d_type == DT_FIFO) {
+        } else if (entry->d_type == DT_REG) {
             int src_fd = open(src_path, O_RDONLY);
             if (src_fd == -1) {
                 perror("open src");
@@ -113,6 +120,7 @@ void process_directory(buffer_t *buffer, const char *src_dir, const char *dest_d
 
             pthread_mutex_lock(&buffer->mutex);
             while (buffer->count == buffer->max_size) {
+                printf("Buffer full, manager waiting...\n");
                 pthread_cond_wait(&buffer->not_full, &buffer->mutex);
             }
 
@@ -121,17 +129,14 @@ void process_directory(buffer_t *buffer, const char *src_dir, const char *dest_d
             buffer->buffer[buffer->tail + 1] = dest_fd;
             buffer->tail = (buffer->tail + 2) % (buffer->max_size * 2);
             buffer->count++;
+            printf("Manager added src_fd=%d, dest_fd=%d to buffer\n", src_fd, dest_fd);
 
             pthread_cond_signal(&buffer->not_empty);
             pthread_mutex_unlock(&buffer->mutex);
 
             // Update statistics
             pthread_mutex_lock(&buffer->mutex);
-            if (entry->d_type == DT_REG) {
-                buffer->num_regular_files++;
-            } else if (entry->d_type == DT_FIFO) {
-                buffer->num_fifo_files++;
-            }
+            buffer->num_regular_files++;
             pthread_mutex_unlock(&buffer->mutex);
         }
     }
@@ -149,6 +154,7 @@ void *manager_thread(void *arg) {
 
     pthread_mutex_lock(&buffer->mutex);
     buffer->done = 1;
+    printf("Manager done processing, signaling workers...\n");
     pthread_cond_broadcast(&buffer->not_empty);
     pthread_mutex_unlock(&buffer->mutex);
 
@@ -161,10 +167,12 @@ void *worker_thread(void *arg) {
     while (1) {
         pthread_mutex_lock(&buffer->mutex);
         while (buffer->count == 0 && !buffer->done) {
+            printf("Worker waiting, buffer empty...\n");
             pthread_cond_wait(&buffer->not_empty, &buffer->mutex);
         }
 
         if (buffer->count == 0 && buffer->done) {
+            printf("Worker exiting, no more files to process...\n");
             pthread_mutex_unlock(&buffer->mutex);
             break;
         }
@@ -173,6 +181,7 @@ void *worker_thread(void *arg) {
         int dest_fd = buffer->buffer[buffer->head + 1];
         buffer->head = (buffer->head + 2) % (buffer->max_size * 2);
         buffer->count--;
+        printf("Worker processing src_fd=%d, dest_fd=%d from buffer\n", src_fd, dest_fd);
 
         pthread_cond_signal(&buffer->not_full);
         pthread_mutex_unlock(&buffer->mutex);
@@ -202,6 +211,8 @@ void *worker_thread(void *arg) {
 }
 
 int main(int argc, char *argv[]) {
+    struct timespec start, end;
+
     if (argc != 5) {
         printf("Usage: %s <buffer_size> <num_workers> <src_dir> <dest_dir>\n", argv[0]);
         return 1;
@@ -218,14 +229,13 @@ int main(int argc, char *argv[]) {
     }
 
     buffer_t *buffer = create_buffer(buffer_size);
+    pthread_t manager;
+    pthread_t workers[num_workers];
 
     // Install signal handler
     signal(SIGINT, handle_signal);
 
-    pthread_t manager;
-    pthread_t workers[num_workers];
-
-    struct timespec start, end;
+    // Start timer
     clock_gettime(CLOCK_MONOTONIC, &start);
 
     // Prepare manager arguments
@@ -241,10 +251,13 @@ int main(int argc, char *argv[]) {
 
     // Wait for manager and workers to complete
     pthread_join(manager, NULL);
+    printf("Manager thread joined.\n");
     for (int i = 0; i < num_workers; i++) {
         pthread_join(workers[i], NULL);
+        printf("Worker thread %d joined.\n", i);
     }
 
+    // Stop timer
     clock_gettime(CLOCK_MONOTONIC, &end);
 
     // Calculate elapsed time
@@ -259,7 +272,6 @@ int main(int argc, char *argv[]) {
     printf("\n---------------STATISTICS--------------------\n");
     printf("Consumers: %d - Buffer Size: %d\n", num_workers, buffer_size);
     printf("Number of Regular File: %d\n", buffer->num_regular_files);
-    printf("Number of FIFO File: %d\n", buffer->num_fifo_files);
     printf("Number of Directory: %d\n", buffer->num_directories);
     printf("TOTAL BYTES COPIED: %zu\n", buffer->total_bytes_copied);
     printf("TOTAL TIME: %02ld:%02ld.%03ld (min:sec.mili)\n", minutes, seconds, milliseconds);
