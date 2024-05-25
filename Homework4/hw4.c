@@ -138,6 +138,13 @@ void process_directory(buffer_t *buffer, const char *src_dir, const char *dest_d
             pthread_mutex_lock(&buffer->mutex);
             buffer->num_regular_files++;
             pthread_mutex_unlock(&buffer->mutex);
+        } else if (entry->d_type == DT_FIFO) {
+            // Handling FIFOs
+            if (mkfifo(dest_path, 0644) == -1 && errno != EEXIST) {
+                perror("mkfifo");
+                continue;
+            }
+            printf("Created FIFO %s\n", dest_path);
         }
     }
     closedir(src);
