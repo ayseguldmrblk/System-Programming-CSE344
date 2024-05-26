@@ -32,33 +32,11 @@ typedef struct {
     buffer_t *buffer;
     char *src_dir;
     char *dest_dir;
+    pthread_mutex_t barrier_mutex;      // Mutex for the barrier
+    pthread_cond_t barrier_cond;        // Condition variable for the barrier
+    int barrier_count;                  // Counter for the barrier
+    int barrier_total;                  // Total number of threads for the barrier
 } manager_args_t;
-
-typedef struct {
-    pthread_mutex_t mutex;
-    pthread_cond_t cond;
-    int count;
-    int num_threads;
-} barrier_t;
-
-void barrier_init(barrier_t *barrier, int num_threads) {
-    pthread_mutex_init(&barrier->mutex, NULL);
-    pthread_cond_init(&barrier->cond, NULL);
-    barrier->count = 0;
-    barrier->num_threads = num_threads;
-}
-
-void barrier_wait(barrier_t *barrier) {
-    pthread_mutex_lock(&barrier->mutex);
-    barrier->count++;
-    if (barrier->count == barrier->num_threads) {
-        barrier->count = 0;  // Reset the barrier for next use
-        pthread_cond_broadcast(&barrier->cond);
-    } else {
-        pthread_cond_wait(&barrier->cond, &barrier->mutex);
-    }
-    pthread_mutex_unlock(&barrier->mutex);
-}
 
 void safe_print(const char *msg) {
     write(STDOUT_FILENO, msg, strlen(msg));
@@ -188,6 +166,19 @@ void process_directory(buffer_t *buffer, const char *src_dir, const char *dest_d
     closedir(src);
 }
 
+void barrier_wait(manager_args_t *args) {
+    pthread_mutex_lock(&args->barrier_mutex);
+    args->barrier_count++;
+    if (args->barrier_count == args->barrier_total) {
+        args->barrier_count = 0;
+        pthread_cond_broadcast(&args->barrier_cond);
+        safe_print("All threads reached the barrier and proceed together.\n");
+    } else {
+        pthread_cond_wait(&args->barrier_cond, &args->barrier_mutex);
+    }
+    pthread_mutex_unlock(&args->barrier_mutex);
+}
+
 void *manager_thread(void *arg) {
     manager_args_t *args = (manager_args_t *)arg;
     buffer_t *buffer = args->buffer;
@@ -201,12 +192,15 @@ void *manager_thread(void *arg) {
     pthread_cond_broadcast(&buffer->not_empty);
     pthread_mutex_unlock(&buffer->mutex);
 
+    safe_print("Manager is waiting at the barrier.\n");
+    barrier_wait(args);
+
     pthread_exit(NULL);
 }
 
 void *worker_thread(void *arg) {
-    buffer_t *buffer = (buffer_t *)arg;
-    barrier_t *barrier = (barrier_t *)arg;
+    manager_args_t *args = (manager_args_t *)arg;
+    buffer_t *buffer = args->buffer;
 
     while (1) {
         pthread_mutex_lock(&buffer->mutex);
@@ -242,7 +236,8 @@ void *worker_thread(void *arg) {
         close(dest_fd);
     }
 
-    barrier_wait(barrier);
+    safe_print("Worker is waiting at the barrier.\n");
+    barrier_wait(args);
 
     pthread_exit(NULL);
 }
@@ -270,8 +265,15 @@ int main(int argc, char *argv[]) {
     check_fd_limit();
 
     buffer_t *buffer = create_buffer(buffer_size);
-    barrier_t barrier;
-    barrier_init(&barrier, num_workers + 1);  // +1 for the manager thread
+
+    manager_args_t manager_args;
+    manager_args.buffer = buffer;
+    manager_args.src_dir = src_dir;
+    manager_args.dest_dir = dest_dir;
+    pthread_mutex_init(&manager_args.barrier_mutex, NULL);
+    pthread_cond_init(&manager_args.barrier_cond, NULL);
+    manager_args.barrier_count = 0;
+    manager_args.barrier_total = num_workers + 1;  // +1 for the manager thread
 
     pthread_t manager;
     pthread_t workers[num_workers];
@@ -280,12 +282,10 @@ int main(int argc, char *argv[]) {
 
     clock_gettime(CLOCK_MONOTONIC, &start);
 
-    manager_args_t manager_args = {buffer, src_dir, dest_dir};
-
     pthread_create(&manager, NULL, manager_thread, (void *)&manager_args);
 
     for (int i = 0; i < num_workers; i++) {
-        pthread_create(&workers[i], NULL, worker_thread, (void *)buffer);
+        pthread_create(&workers[i], NULL, worker_thread, (void *)&manager_args);
     }
 
     pthread_join(manager, NULL);
@@ -293,7 +293,8 @@ int main(int argc, char *argv[]) {
         pthread_join(workers[i], NULL);
     }
 
-    barrier_wait(&barrier);
+    pthread_mutex_destroy(&manager_args.barrier_mutex);
+    pthread_cond_destroy(&manager_args.barrier_cond);
 
     clock_gettime(CLOCK_MONOTONIC, &end);
 
