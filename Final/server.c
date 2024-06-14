@@ -15,7 +15,6 @@
 #include "common.h"
 #include "thread_pool.h"
 
-
 sem_t *oven_sem;
 sem_t *delivery_sem;
 pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -87,6 +86,12 @@ void *delivery_worker(void *arg) {
             log_activity("Delivering order");
             sleep(1); // Simulate delivery time
             log_activity("Order delivered");
+
+            // Update client about the delivery
+            int sock = task.sock;
+            strcpy(task.status, "Delivered");
+            send(sock, &task, sizeof(task), 0);
+            close(sock);
         } else {
             pthread_mutex_unlock(&pool->task_mutex);
         }
@@ -105,12 +110,13 @@ void *handle_client(void *client_socket) {
     snprintf(log_msg, sizeof(log_msg), "Received order %d from client %s", order.order_id, order.client_address);
     log_activity(log_msg);
 
+    order.sock = sock;  // Save socket descriptor for later updates
+
     pthread_mutex_lock(&cook_task_pool.task_mutex);
     cook_task_pool.tasks[cook_task_pool.task_index++] = order;
     pthread_mutex_unlock(&cook_task_pool.task_mutex);
     sem_post(&cook_task_pool.task_sem);
 
-    close(sock);
     pthread_exit(NULL);
 }
 

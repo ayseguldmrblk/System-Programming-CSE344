@@ -11,8 +11,9 @@
 #define MAX_DELIVERY_CAPACITY 3
 
 typedef struct {
-    int request_type; // Added field for request type
+    int request_type;
     int order_id;
+    int sock; // Add this field to store the socket descriptor
     char client_address[256];
     char status[256]; // placed, prepared, cooked, delivered, canceled
     char data[1024]; // additional information if needed
