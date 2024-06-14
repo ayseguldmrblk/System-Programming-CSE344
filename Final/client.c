@@ -7,9 +7,8 @@
 #include <pthread.h>
 #include "common.h"
 
-#define PORT 8080
-
 int order_id = 0;
+double p, q;
 
 void signal_handler(int sig) {
     if (sig == SIGINT) {
@@ -24,28 +23,37 @@ void *place_order(void *arg) {
     order_t order;
     order.request_type = ORDER_PLACED;
     order.order_id = order_id++;
-    snprintf(order.client_address, sizeof(order.client_address), "Client Address %d", order.order_id);
+
+    // Generate a random location for the client
+    double x = ((double)rand() / RAND_MAX) * p;
+    double y = ((double)rand() / RAND_MAX) * q;
+    snprintf(order.client_address, sizeof(order.client_address), "%.2lf %.2lf", x, y);
     strcpy(order.status, "Placed");
 
     send(sock, &order, sizeof(order), 0);
 
-    read(sock, &order, sizeof(order));
-    printf("Order %d: %s\n", order.order_id, order.status);
+    while (1) {
+        int n = read(sock, &order, sizeof(order));
+        if (n <= 0) break;
+        printf("Order %d: %s (Cook %d, Moto %d)\n", order.order_id, order.status, order.cook_id, order.delivery_id);
+        if (strcmp(order.status, "Delivered") == 0) break;
+    }
 
     close(sock);
     pthread_exit(NULL);
 }
 
 int main(int argc, char const *argv[]) {
-    if (argc != 5) {
-        fprintf(stderr, "Usage: %s <server_address> <num_clients> <p> <q>\n", argv[0]);
+    if (argc != 6) {
+        fprintf(stderr, "Usage: %s <server_address> <port> <num_clients> <p> <q>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
     char *server_address = argv[1];
-    int num_clients = atoi(argv[2]);
-    int p = atoi(argv[3]);
-    int q = atoi(argv[4]);
+    int port = atoi(argv[2]);
+    int num_clients = atoi(argv[3]);
+    p = atof(argv[4]);
+    q = atof(argv[5]);
 
     // Signal handling
     signal(SIGINT, signal_handler);
@@ -61,7 +69,7 @@ int main(int argc, char const *argv[]) {
 
         struct sockaddr_in serv_addr;
         serv_addr.sin_family = AF_INET;
-        serv_addr.sin_port = htons(PORT);
+        serv_addr.sin_port = htons(port);
 
         if (inet_pton(AF_INET, server_address, &serv_addr.sin_addr) <= 0) {
             perror("Invalid address/ Address not supported");
