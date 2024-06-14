@@ -9,9 +9,23 @@
 
 int order_id = 0;
 double p, q;
+int num_clients;
+char server_address[256];
+int port;
+int *client_sockets;
 
-void signal_handler(int sig) {
+void cancel_orders(int sig) {
     if (sig == SIGINT) {
+        for (int i = 0; i < num_clients; i++) {
+            if (client_sockets[i] != -1) {
+                order_t order;
+                order.request_type = ORDER_CANCELLED;
+                order.order_id = i; // Cancel the corresponding order
+                send(client_sockets[i], &order, sizeof(order), 0);
+                close(client_sockets[i]);
+                client_sockets[i] = -1; // Mark this socket as closed
+            }
+        }
         exit(0);
     }
 }
@@ -22,7 +36,7 @@ void *place_order(void *arg) {
 
     order_t order;
     order.request_type = ORDER_PLACED;
-    order.order_id = order_id++;
+    order.order_id = __sync_fetch_and_add(&order_id, 1); // Thread-safe increment
 
     // Generate a random location for the client
     double x = ((double)rand() / RAND_MAX) * p;
@@ -36,7 +50,7 @@ void *place_order(void *arg) {
         int n = read(sock, &order, sizeof(order));
         if (n <= 0) break;
         printf("Order %d: %s (Cook %d, Moto %d)\n", order.order_id, order.status, order.cook_id, order.delivery_id);
-        if (strcmp(order.status, "Delivered") == 0) break;
+        if (strcmp(order.status, "Delivered") == 0 || strcmp(order.status, "Cancelled") == 0) break;
     }
 
     close(sock);
@@ -49,21 +63,37 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    char *server_address = argv[1];
-    int port = atoi(argv[2]);
-    int num_clients = atoi(argv[3]);
+    strcpy(server_address, argv[1]);
+    port = atoi(argv[2]);
+    num_clients = atoi(argv[3]);
     p = atof(argv[4]);
     q = atof(argv[5]);
 
+    // Seed the random number generator
+    srand(time(NULL));
+
+    // Allocate memory for client sockets
+    client_sockets = malloc(num_clients * sizeof(int));
+    if (!client_sockets) {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
+
     // Signal handling
-    signal(SIGINT, signal_handler);
+    signal(SIGINT, cancel_orders);
 
     pthread_t tid[num_clients];
 
     for (int i = 0; i < num_clients; i++) {
         int *sock = malloc(sizeof(int));
+        if (sock == NULL) {
+            perror("malloc");
+            return -1;
+        }
+
         if ((*sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
             perror("Socket creation error");
+            free(sock);
             return -1;
         }
 
@@ -73,14 +103,17 @@ int main(int argc, char const *argv[]) {
 
         if (inet_pton(AF_INET, server_address, &serv_addr.sin_addr) <= 0) {
             perror("Invalid address/ Address not supported");
+            free(sock);
             return -1;
         }
 
         if (connect(*sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
             perror("Connection failed");
+            free(sock);
             return -1;
         }
 
+        client_sockets[i] = *sock; // Store the socket descriptor
         pthread_create(&tid[i], NULL, place_order, sock);
     }
 
@@ -88,5 +121,6 @@ int main(int argc, char const *argv[]) {
         pthread_join(tid[i], NULL);
     }
 
+    free(client_sockets);
     return 0;
 }

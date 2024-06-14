@@ -20,7 +20,7 @@
 #include "delivery.h"
 #include "complex_matrix.h"
 
-#define SERVER_BACKLOG 50
+#define SERVER_BACKLOG 200
 
 // Delivery velocity (m/min)
 int delivery_speed;
@@ -77,6 +77,34 @@ int get_unique_delivery_id() {
     return id;
 }
 
+void remove_order_from_queue(queue_t* queue, int order_id) {
+    pthread_mutex_lock(&order_mutex);
+    queue_t temp_queue;
+    init_queue(&temp_queue);
+
+    while (!is_empty(queue)) {
+        order_t order = dequeue(queue);
+        if (order.order_id != order_id) {
+            enqueue(&temp_queue, order);
+        } else {
+            char log_msg[256];
+            snprintf(log_msg, sizeof(log_msg), "Order %d: Cancelled", order_id);
+            log_activity(log_msg);
+        }
+    }
+
+    while (!is_empty(&temp_queue)) {
+        enqueue(queue, dequeue(&temp_queue));
+    }
+
+    pthread_mutex_unlock(&order_mutex);
+}
+
+void update_client(order_t order, const char *status) {
+    strcpy(order.status, status);
+    send(order.sock, &order, sizeof(order), 0);
+}
+
 void *cook_worker(void *arg) {
     int cook_id = *(int *)arg;
     thread_pool_t *pool = &cook_task_pool;
@@ -97,6 +125,7 @@ void *cook_worker(void *arg) {
             char log_msg[256];
             snprintf(log_msg, sizeof(log_msg), "Cook %d: Cooking order %d", cook_id, task.order_id);
             log_activity(log_msg);
+            update_client(task, "Cooking");
 
             complex_matrix_t *matrix = create_matrix(30, 40);
             generate_random_matrix(matrix);
@@ -112,6 +141,7 @@ void *cook_worker(void *arg) {
             sem_wait(oven_sem); // Lock oven tool
             snprintf(log_msg, sizeof(log_msg), "Cook %d: Placing order %d in the oven", cook_id, task.order_id);
             log_activity(log_msg);
+            update_client(task, "In Oven");
             enqueue(&oven_queue, task);
             snprintf(log_msg, sizeof(log_msg), "Cook %d: Order %d placed in the oven", cook_id, task.order_id);
             log_activity(log_msg);
@@ -132,6 +162,7 @@ void *cook_worker(void *arg) {
 
             snprintf(log_msg, sizeof(log_msg), "Cook %d: Order %d cooked", cook_id, task.order_id);
             log_activity(log_msg);
+            update_client(task, "Cooked");
 
             // Add to delivery task pool
             pthread_mutex_lock(&delivery_task_pool.task_mutex);
@@ -166,6 +197,7 @@ void *delivery_worker(void *arg) {
             char log_msg[256];
             snprintf(log_msg, sizeof(log_msg), "Moto %d: Delivering order %d", delivery_id, task.order_id);
             log_activity(log_msg);
+            update_client(task, "Delivering");
 
             // Calculate delivery time based on customer location
             location_t customer_location;
@@ -179,10 +211,8 @@ void *delivery_worker(void *arg) {
             sem_post(delivery_sem); // Release delivery personnel
 
             // Update client about the delivery
-            int sock = task.sock;
-            strcpy(task.status, "Delivered");
-            send(sock, &task, sizeof(task), 0);
-            close(sock);
+            update_client(task, "Delivered");
+            close(task.sock);
         } else {
             pthread_mutex_unlock(&pool->task_mutex);
         }
@@ -200,6 +230,16 @@ void *handle_client(void *client_socket) {
     char log_msg[256];
     snprintf(log_msg, sizeof(log_msg), "Received order %d from client %s", order.order_id, order.client_address);
     log_activity(log_msg);
+
+    if (order.request_type == ORDER_CANCELLED) {
+        // Handle order cancellation
+        remove_order_from_queue(&order_queue, order.order_id);
+        remove_order_from_queue(&oven_queue, order.order_id);
+        remove_order_from_queue(&delivery_queue, order.order_id);
+        update_client(order, "Cancelled");
+        close(sock);
+        pthread_exit(NULL);
+    }
 
     order.sock = sock;  // Save socket descriptor for later updates
 
@@ -350,16 +390,16 @@ int main(int argc, char const *argv[]) {
     pthread_create(&manager_tid, NULL, manager_worker, NULL);
 
     // Create cook and delivery worker threads
+    int *cook_ids = malloc(cook_thread_pool_size * sizeof(int));
+    int *delivery_ids = malloc(delivery_thread_pool_size * sizeof(int));
     for (int i = 0; i < cook_thread_pool_size; i++) {
-        int *cook_id = malloc(sizeof(int));
-        *cook_id = get_unique_cook_id();  // Assign unique ID
-        pthread_create(&cook_task_pool.threads[i], NULL, cook_worker, cook_id);
+        cook_ids[i] = get_unique_cook_id();  // Assign unique ID
+        pthread_create(&cook_task_pool.threads[i], NULL, cook_worker, &cook_ids[i]);
     }
 
     for (int i = 0; i < delivery_thread_pool_size; i++) {
-        int *delivery_id = malloc(sizeof(int));
-        *delivery_id = get_unique_delivery_id();  // Assign unique ID
-        pthread_create(&delivery_task_pool.threads[i], NULL, delivery_worker, delivery_id);
+        delivery_ids[i] = get_unique_delivery_id();  // Assign unique ID
+        pthread_create(&delivery_task_pool.threads[i], NULL, delivery_worker, &delivery_ids[i]);
     }
 
     while (1) {
@@ -376,6 +416,15 @@ int main(int argc, char const *argv[]) {
         pthread_create(&tid, NULL, handle_client, client_socket);
     }
 
+    // Clean up resources
+    for (int i = 0; i < cook_thread_pool_size; i++) {
+        pthread_join(cook_task_pool.threads[i], NULL);
+    }
+    for (int i = 0; i < delivery_thread_pool_size; i++) {
+        pthread_join(delivery_task_pool.threads[i], NULL);
+    }
+    free(cook_ids);
+    free(delivery_ids);
     sem_close(oven_sem);
     sem_unlink("/oven_sem");
     sem_close(oven_capacity_sem);
