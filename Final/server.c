@@ -15,9 +15,6 @@
 
 #define PORT 8080
 #define MAX_CLIENTS 50
-#define MAX_OVEN_CAPACITY 6
-#define MAX_OVEN_TOOLS 3
-#define MAX_DELIVERY_CAPACITY 3
 
 sem_t *oven_sem;
 sem_t *delivery_sem;
