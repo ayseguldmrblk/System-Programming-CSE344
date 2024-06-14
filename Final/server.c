@@ -10,11 +10,11 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netdb.h>
 #include <time.h>
 #include "common.h"
+#include "thread_pool.h"
 
-#define PORT 8080
-#define MAX_CLIENTS 50
 
 sem_t *oven_sem;
 sem_t *delivery_sem;
@@ -23,6 +23,9 @@ pthread_mutex_t order_mutex = PTHREAD_MUTEX_INITIALIZER;
 order_t orders[MAX_CLIENTS];
 int order_count = 0;
 FILE *log_file;
+
+thread_pool_t cook_task_pool;
+thread_pool_t delivery_task_pool;
 
 void signal_handler(int sig) {
     if (sig == SIGINT) {
@@ -41,10 +44,60 @@ void log_activity(const char *activity) {
     pthread_mutex_unlock(&log_mutex);
 }
 
+void *cook_worker(void *arg) {
+    thread_pool_t *pool = (thread_pool_t *)arg;
+    while (1) {
+        sem_wait(&pool->task_sem);
+        pthread_mutex_lock(&pool->task_mutex);
+
+        if (pool->task_index > 0) {
+            // Get the next task
+            order_t task = pool->tasks[--pool->task_index];
+            pthread_mutex_unlock(&pool->task_mutex);
+
+            // Simulate cooking
+            log_activity("Cooking order");
+            sleep(2); // Simulate cooking time
+            log_activity("Order cooked");
+
+            // Add to delivery task pool
+            pthread_mutex_lock(&delivery_task_pool.task_mutex);
+            delivery_task_pool.tasks[delivery_task_pool.task_index++] = task;
+            pthread_mutex_unlock(&delivery_task_pool.task_mutex);
+            sem_post(&delivery_task_pool.task_sem);
+        } else {
+            pthread_mutex_unlock(&pool->task_mutex);
+        }
+    }
+    return NULL;
+}
+
+void *delivery_worker(void *arg) {
+    thread_pool_t *pool = (thread_pool_t *)arg;
+    while (1) {
+        sem_wait(&pool->task_sem);
+        pthread_mutex_lock(&pool->task_mutex);
+
+        if (pool->task_index > 0) {
+            // Get the next task
+            order_t task = pool->tasks[--pool->task_index];
+            pthread_mutex_unlock(&pool->task_mutex);
+
+            // Simulate delivery
+            log_activity("Delivering order");
+            sleep(1); // Simulate delivery time
+            log_activity("Order delivered");
+        } else {
+            pthread_mutex_unlock(&pool->task_mutex);
+        }
+    }
+    return NULL;
+}
+
 void *handle_client(void *client_socket) {
     int sock = *(int *)client_socket;
     free(client_socket);
-    
+
     order_t order;
     read(sock, &order, sizeof(order));
 
@@ -52,30 +105,10 @@ void *handle_client(void *client_socket) {
     snprintf(log_msg, sizeof(log_msg), "Received order %d from client %s", order.order_id, order.client_address);
     log_activity(log_msg);
 
-    pthread_mutex_lock(&order_mutex);
-    orders[order_count++] = order;
-    pthread_mutex_unlock(&order_mutex);
-
-    // Simulate cooking
-    sem_wait(oven_sem); // Lock oven tool
-    log_activity("Cooking order");
-
-    sleep(2); // Simulate cooking time
-
-    log_activity("Order cooked");
-    sem_post(oven_sem); // Release oven tool
-
-    // Simulate delivery
-    sem_wait(delivery_sem); // Lock delivery personnel
-    log_activity("Delivering order");
-
-    sleep(1); // Simulate delivery time
-
-    log_activity("Order delivered");
-    sem_post(delivery_sem); // Release delivery personnel
-
-    strcpy(order.status, "Delivered");
-    send(sock, &order, sizeof(order), 0);
+    pthread_mutex_lock(&cook_task_pool.task_mutex);
+    cook_task_pool.tasks[cook_task_pool.task_index++] = order;
+    pthread_mutex_unlock(&cook_task_pool.task_mutex);
+    sem_post(&cook_task_pool.task_sem);
 
     close(sock);
     pthread_exit(NULL);
@@ -126,7 +159,7 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
     address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_addr.s_addr = inet_addr("192.168.0.10"); // Bind to specific IP
     address.sin_port = htons(port);
 
     // Bind the socket to the network address and port
@@ -141,8 +174,12 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    printf("Server started on port %d\n", port);
+    printf("Server started on IP %s and port %d\n", inet_ntoa(address.sin_addr), port);
     log_activity("Server started");
+
+    // Initialize cook and delivery thread pools
+    init_thread_pool(&cook_task_pool, cook_thread_pool_size, cook_worker);
+    init_thread_pool(&delivery_task_pool, delivery_thread_pool_size, delivery_worker);
 
     while (1) {
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen)) < 0) {
