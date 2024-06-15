@@ -14,7 +14,6 @@ int port;
 
 void signal_handler(int sig) {
     if (sig == SIGINT) {
-        printf("\nSending cancellation requests...\n");
         // Send cancellation signal to server for each active order
         order_t order;
         order.request_type = ORDER_CANCELLED;
@@ -43,10 +42,11 @@ void signal_handler(int sig) {
                 exit(EXIT_FAILURE);
             }
 
+            printf("Sending cancellation request for order %d\n", order.order_id); // Debug statement
             send(sock, &order, sizeof(order), 0);
             close(sock);
         }
-        printf("Cancellation requests sent. Exiting client.\n");
+        printf("Cancellation requests sent. Exiting client.\n"); // Debug statement
         exit(0);
     }
 }

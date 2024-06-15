@@ -24411,3 +24411,1677 @@ Moto 1215316368: Order 44 delivered
 Moto 6: Delivering orders
 Moto 6: Order 47 delivered
 Moto 6: Order 48 delivered
+Server started
+Accepted new client connection
+Received order 0 from client 0.00 2.63
+Accepted new client connection
+Cook 1: Cooking order 0
+Received order 1 from client 7.56 9.17
+Cook 1: Placing order 0 in the oven
+Cook 1: Order 0 placed in the oven
+Cook 840974464: Cooking order 1
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Received order 2 from client 5.33 4.38
+Received order 4 from client 6.79 18.69
+Cook 1: Removing order 0 from the oven
+Cook 1: Order 0 removed from the oven
+Accepted new client connection
+Cook 2: Cooking order 2
+Accepted new client connection
+Received order 3 from client 0.47 13.58
+Received order 6 from client 8.31 0.69
+Cook 1: Order 0 cooked
+Cook 840974464: Cooking order 4
+Received order 5 from client 3.84 10.39
+Accepted new client connection
+Cook 840974464: Placing order 1 in the oven
+Cook 4: Cooking order 3
+Cook 840974464: Order 1 placed in the oven
+Cook 840974464: Removing order 1 from the oven
+Cook 840974464: Order 1 removed from the oven
+Cook 840974464: Order 1 cooked
+Cook 3: Cooking order 6
+Accepted new client connection
+Accepted new client connection
+Cook 840974464: Cooking order 5
+Received order 8 from client 6.71 0.15
+Cook 2: Placing order 2 in the oven
+Cook 2: Order 2 placed in the oven
+Cook 2: Removing order 2 from the oven
+Cook 2: Order 2 removed from the oven
+Cook 2: Order 2 cooked
+Cook 840974464: Placing order 4 in the oven
+Cook 840974464: Order 4 placed in the oven
+Cook 840974464: Removing order 4 from the oven
+Cook 840974464: Order 4 removed from the oven
+Cook 840974464: Order 4 cooked
+Accepted new client connection
+Accepted new client connection
+Cook 3: Placing order 6 in the oven
+Accepted new client connection
+Received order 7 from client 0.53 10.59
+Received order 12 from client 8.46 10.54
+Cook 4: Placing order 3 in the oven
+Cook 4: Order 3 placed in the oven
+Cook 4: Removing order 3 from the oven
+Cook 4: Order 3 removed from the oven
+Cook 1: Cooking order 8
+Accepted new client connection
+Moto 840974496: Delivering orders
+Accepted new client connection
+Accepted new client connection
+Cook 4: Order 3 cooked
+Cook 840974464: Cooking order 7
+Received order 11 from client 5.89 18.61
+Cook 2: Cooking order 11
+Received order 9 from client 3.83 1.34
+Received order 10 from client 4.17 13.74
+Received order 13 from client 0.92 13.08
+Cook 840974464: Cooking order 12
+Received order 14 from client 4.16 14.02
+Accepted new client connection
+Received order 15 from client 9.10 15.24
+Cook 3: Order 6 placed in the oven
+Received order 16 from client 2.62 0.95
+Cook 840974464: Cooking order 9
+Cook 1: Placing order 8 in the oven
+Cook 4: Cooking order 13
+Moto 840974496: Order 2 delivered
+Accepted new client connection
+Cook 840974464: Placing order 5 in the oven
+Cook 840974464: Placing order 7 in the oven
+Cook 840974464: Order 7 placed in the oven
+Received order 17 from client 7.36 6.56
+Cook 3: Removing order 6 from the oven
+Cook 3: Order 6 removed from the oven
+Cook 3: Order 6 cooked
+Cook 3: Cooking order 17
+Moto 840974496: Order 1 delivered
+Moto 840974496: Order 0 delivered
+Cook 2: Placing order 11 in the oven
+Cook 2: Order 11 placed in the oven
+Cook 1: Order 8 placed in the oven
+Accepted new client connection
+Accepted new client connection
+Received order 18 from client 6.33 15.13
+Cook 840974464: Placing order 12 in the oven
+Cook 840974464: Order 12 placed in the oven
+Cook 840974464: Order 5 placed in the oven
+Accepted new client connection
+Moto 5: Delivering orders
+Received order 19 from client 9.91 7.31
+Received order 20 from client 2.47 19.65
+Cook 840974464: Placing order 9 in the oven
+Cook 840974464: Order 9 placed in the oven
+Cook 1: Removing order 8 from the oven
+Cook 1: Order 8 removed from the oven
+Moto 5: Order 6 delivered
+Cook 840974464: Removing order 7 from the oven
+Cook 840974464: Order 7 removed from the oven
+Cook 840974464: Order 7 cooked
+Cook 840974464: Removing order 12 from the oven
+Cook 840974464: Removing order 5 from the oven
+Cook 840974464: Order 5 removed from the oven
+Cook 840974464: Order 5 cooked
+Cook 840974464: Removing order 9 from the oven
+Cook 840974464: Order 9 removed from the oven
+Cook 840974464: Order 9 cooked
+Cook 840974464: Cooking order 18
+Moto 5: Order 3 delivered
+Accepted new client connection
+Cook 840974464: Cooking order 19
+Cook 1: Order 8 cooked
+Cook 1: Cooking order 16
+Cook 840974464: Order 12 removed from the oven
+Cook 840974464: Order 12 cooked
+Cook 840974464: Cooking order 15
+Cook 2: Removing order 11 from the oven
+Cook 2: Order 11 removed from the oven
+Moto 5: Order 4 delivered
+Moto 1: Delivering orders
+Moto 1: Order 9 delivered
+Received order 21 from client 7.23 15.07
+Cook 3: Placing order 17 in the oven
+Cook 3: Order 17 placed in the oven
+Cook 3: Removing order 17 from the oven
+Cook 3: Order 17 removed from the oven
+Moto 1: Order 5 delivered
+Cook 4: Placing order 13 in the oven
+Cook 4: Order 13 placed in the oven
+Cook 4: Removing order 13 from the oven
+Cook 4: Order 13 removed from the oven
+Cook 4: Order 13 cooked
+Cook 4: Cooking order 21
+Cook 3: Order 17 cooked
+Cook 1: Placing order 16 in the oven
+Cook 1: Order 16 placed in the oven
+Cook 1: Removing order 16 from the oven
+Cook 1: Order 16 removed from the oven
+Cook 1: Order 16 cooked
+Moto 1: Order 7 delivered
+Cook 3: Cooking order 14
+Cook 840974464: Placing order 18 in the oven
+Cook 840974464: Order 18 placed in the oven
+Cook 4: Placing order 21 in the oven
+Cook 840974464: Placing order 15 in the oven
+Cook 840974464: Cooking order 20
+Moto 6: Delivering orders
+Cook 1: Cooking order 10
+Cook 840974464: Placing order 19 in the oven
+Cook 840974464: Order 19 placed in the oven
+Cook 840974464: Removing order 18 from the oven
+Cook 840974464: Order 18 removed from the oven
+Cook 4: Order 21 placed in the oven
+Moto 6: Order 13 delivered
+Cook 2: Order 11 cooked
+Accepted new client connection
+Moto 840974496: Delivering orders
+Accepted new client connection
+Moto 840974496: Order 11 delivered
+Moto 840974496: Order 16 delivered
+Moto 840974496: Order 17 delivered
+Cook 840974464: Order 18 cooked
+Cook 840974464: Removing order 19 from the oven
+Cook 840974464: Order 19 removed from the oven
+Cook 840974464: Order 19 cooked
+Accepted new client connection
+Received order 23 from client 6.32 17.69
+Accepted new client connection
+Moto 6: Order 12 delivered
+Cook 3: Placing order 14 in the oven
+Cook 3: Order 14 placed in the oven
+Received order 22 from client 6.52 1.45
+Moto 6: Order 8 delivered
+Accepted new client connection
+Received order 24 from client 2.73 8.73
+Accepted new client connection
+Cook 1: Placing order 10 in the oven
+Cook 1: Order 10 placed in the oven
+Accepted new client connection
+Received order 25 from client 7.66 9.55
+Cook 840974464: Cooking order 22
+Cook 4: Removing order 21 from the oven
+Cook 4: Order 21 removed from the oven
+Received order 28 from client 4.87 17.95
+Cook 3: Removing order 14 from the oven
+Cook 3: Order 14 removed from the oven
+Cook 3: Order 14 cooked
+Received order 27 from client 3.59 3.33
+Cook 2: Cooking order 24
+Cook 840974464: Cooking order 25
+Accepted new client connection
+Cook 4: Order 21 cooked
+Cook 840974464: Order 15 placed in the oven
+Cook 840974464: Removing order 15 from the oven
+Cook 4: Cooking order 27
+Cook 3: Cooking order 28
+Received order 26 from client 2.38 5.50
+Cook 1: Removing order 10 from the oven
+Cook 840974464: Placing order 20 in the oven
+Moto 840974496: Delivering orders
+Cook 840974464: Order 20 placed in the oven
+Cook 840974464: Order 15 removed from the oven
+Received order 29 from client 9.09 1.21
+Accepted new client connection
+Moto 840974496: Order 14 delivered
+Moto 840974496: Order 19 delivered
+Cook 1: Order 10 removed from the oven
+Cook 840974464: Removing order 20 from the oven
+Cook 840974464: Order 20 removed from the oven
+Cook 840974464: Order 15 cooked
+Received order 30 from client 9.05 10.09
+Cook 840974464: Placing order 22 in the oven
+Accepted new client connection
+Cook 840974464: Placing order 25 in the oven
+Cook 1: Order 10 cooked
+Moto 840974496: Order 18 delivered
+Cook 3: Placing order 28 in the oven
+Cook 3: Order 28 placed in the oven
+Cook 4: Placing order 27 in the oven
+Cook 840974464: Order 22 placed in the oven
+Accepted new client connection
+Cook 840974464: Order 25 placed in the oven
+Received order 31 from client 5.16 6.38
+Cook 1: Cooking order 30
+Moto 5: Delivering orders
+Cook 840974464: Order 20 cooked
+Moto 5: Order 10 delivered
+Moto 5: Order 15 delivered
+Moto 5: Order 21 delivered
+Cook 840974464: Cooking order 29
+Received order 32 from client 9.87 9.88
+Cook 4: Order 27 placed in the oven
+Cook 3: Removing order 28 from the oven
+Cook 840974464: Cooking order 31
+Cook 2: Placing order 24 in the oven
+Cook 2: Order 24 placed in the oven
+Cook 3: Order 28 removed from the oven
+Cook 3: Order 28 cooked
+Accepted new client connection
+Cook 4: Removing order 27 from the oven
+Cook 4: Order 27 removed from the oven
+Cook 4: Order 27 cooked
+Cook 2: Removing order 24 from the oven
+Cook 2: Order 24 removed from the oven
+Cook 840974464: Removing order 22 from the oven
+Cook 840974464: Order 22 removed from the oven
+Cook 840974464: Order 22 cooked
+Cook 840974464: Placing order 29 in the oven
+Cook 840974464: Order 29 placed in the oven
+Cook 840974464: Removing order 29 from the oven
+Cook 840974464: Order 29 removed from the oven
+Cook 840974464: Order 29 cooked
+Cook 3: Cooking order 32
+Accepted new client connection
+Cook 1: Placing order 30 in the oven
+Cook 840974464: Cooking order 23
+Cook 840974464: Placing order 31 in the oven
+Cook 840974464: Order 31 placed in the oven
+Cook 840974464: Removing order 31 from the oven
+Cook 840974464: Order 31 removed from the oven
+Cook 840974464: Order 31 cooked
+Cook 2: Order 24 cooked
+Cook 3: Placing order 32 in the oven
+Cook 3: Order 32 placed in the oven
+Cook 3: Removing order 32 from the oven
+Cook 3: Order 32 removed from the oven
+Cook 840974464: Removing order 25 from the oven
+Cook 840974464: Order 25 removed from the oven
+Cook 840974464: Order 25 cooked
+Moto 840974496: Delivering orders
+Accepted new client connection
+Accepted new client connection
+Received order 34 from client 9.48 1.47
+Accepted new client connection
+Received order 33 from client 2.66 1.81
+Cook 1: Order 30 placed in the oven
+Cook 1: Removing order 30 from the oven
+Cook 1: Order 30 removed from the oven
+Cook 1: Order 30 cooked
+Cook 840974464: Placing order 23 in the oven
+Moto 4: Delivering orders
+Received order 36 from client 2.77 18.28
+Accepted new client connection
+Cook 2: Cooking order 33
+Received order 37 from client 5.30 9.29
+Moto 840974496: Order 27 delivered
+Moto 840974496: Order 28 delivered
+Moto 840974496: Order 20 delivered
+Cook 840974464: Cooking order 34
+Accepted new client connection
+Accepted new client connection
+Cook 4: Cooking order 26
+Cook 840974464: Order 23 placed in the oven
+Cook 840974464: Removing order 23 from the oven
+Received order 39 from client 7.62 15.40
+Cook 2: Placing order 33 in the oven
+Cook 2: Order 33 placed in the oven
+Received order 35 from client 5.01 7.68
+Received order 40 from client 8.28 2.51
+Cook 840974464: Order 23 removed from the oven
+Cook 840974464: Order 23 cooked
+Cook 840974464: Cooking order 36
+Cook 1: Cooking order 37
+Cook 840974464: Placing order 34 in the oven
+Cook 840974464: Order 34 placed in the oven
+Cook 840974464: Removing order 34 from the oven
+Cook 840974464: Order 34 removed from the oven
+Cook 840974464: Order 34 cooked
+Cook 840974464: Cooking order 35
+Cook 3: Order 32 cooked
+Cook 840974464: Cooking order 40
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Cook 1: Placing order 37 in the oven
+Received order 41 from client 0.16 13.77
+Cook 2: Removing order 33 from the oven
+Cook 2: Order 33 removed from the oven
+Cook 2: Order 33 cooked
+Moto 4: Order 25 delivered
+Moto 4: Order 24 delivered
+Moto 4: Order 31 delivered
+Cook 1: Order 37 placed in the oven
+Cook 1: Removing order 37 from the oven
+Cook 1: Order 37 removed from the oven
+Cook 840974464: Placing order 35 in the oven
+Cook 840974464: Order 35 placed in the oven
+Cook 1: Order 37 cooked
+Cook 840974464: Cooking order 39
+Cook 4: Placing order 26 in the oven
+Cook 3: Cooking order 41
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Moto 5: Delivering orders
+Moto 5: Order 32 delivered
+Moto 5: Order 34 delivered
+Moto 5: Order 23 delivered
+Moto 840974496: Delivering orders
+Moto 840974496: Order 30 delivered
+Moto 840974496: Order 29 delivered
+Received order 42 from client 8.68 12.59
+Cook 840974464: Removing order 35 from the oven
+Cook 840974464: Order 35 removed from the oven
+Cook 840974464: Placing order 36 in the oven
+Cook 840974464: Order 36 placed in the oven
+Received order 45 from client 2.33 6.13
+Cook 840974464: Placing order 40 in the oven
+Cook 840974464: Order 40 placed in the oven
+Moto 840974496: Order 22 delivered
+Cook 1: Cooking order 42
+Received order 46 from client 3.51 10.27
+Received order 43 from client 7.36 14.51
+Cook 840974464: Removing order 36 from the oven
+Cook 840974464: Order 36 removed from the oven
+Cook 840974464: Order 36 cooked
+Received order 49 from client 2.69 8.31
+Cook 2: Cooking order 45
+Cook 840974464: Placing order 39 in the oven
+Cook 840974464: Order 39 placed in the oven
+Received order 44 from client 9.99 17.77
+Moto 1: Delivering orders
+Moto 1: Order 36 delivered
+Moto 1: Order 37 delivered
+Moto 1: Order 33 delivered
+Cook 3: Placing order 41 in the oven
+Cook 4: Order 26 placed in the oven
+Cook 3: Order 41 placed in the oven
+Received order 47 from client 5.91 16.92
+Received order 38 from client 9.41 1.00
+Cook 840974464: Removing order 40 from the oven
+Cook 840974464: Order 40 removed from the oven
+Cook 840974464: Order 40 cooked
+Cook 840974464: Order 35 cooked
+Cook 840974464: Removing order 39 from the oven
+Cook 840974464: Order 39 removed from the oven
+Cook 840974464: Order 39 cooked
+Cook 840974464: Cooking order 43
+Moto 6: Delivering orders
+Cook 840974464: Cooking order 38
+Cook 840974464: Cooking order 47
+Cook 4: Removing order 26 from the oven
+Cook 4: Order 26 removed from the oven
+Cook 1: Placing order 42 in the oven
+Received order 48 from client 4.12 16.83
+Cook 3: Removing order 41 from the oven
+Cook 3: Order 41 removed from the oven
+Cook 3: Order 41 cooked
+Cook 840974464: Cooking order 44
+Cook 2: Placing order 45 in the oven
+Cook 2: Order 45 placed in the oven
+Moto 6: Order 39 delivered
+Cook 4: Order 26 cooked
+Cook 3: Cooking order 48
+Moto 6: Order 35 delivered
+Moto 6: Order 40 delivered
+Cook 1: Order 42 placed in the oven
+Cook 840974464: Placing order 43 in the oven
+Cook 840974464: Order 43 placed in the oven
+Cook 840974464: Removing order 43 from the oven
+Cook 840974464: Order 43 removed from the oven
+Cook 840974464: Order 43 cooked
+Cook 2: Removing order 45 from the oven
+Cook 2: Order 45 removed from the oven
+Cook 2: Order 45 cooked
+Cook 1: Removing order 42 from the oven
+Moto 840974496: Delivering orders
+Cook 1: Order 42 removed from the oven
+Cook 1: Order 42 cooked
+Cook 840974464: Cooking order 46
+Moto 840974496: Order 43 delivered
+Cook 840974464: Placing order 47 in the oven
+Cook 840974464: Order 47 placed in the oven
+Cook 840974464: Removing order 47 from the oven
+Cook 840974464: Order 47 removed from the oven
+Cook 840974464: Order 47 cooked
+Cook 840974464: Placing order 44 in the oven
+Cook 840974464: Order 44 placed in the oven
+Cook 840974464: Removing order 44 from the oven
+Cook 840974464: Order 44 removed from the oven
+Cook 840974464: Order 44 cooked
+Cook 3: Placing order 48 in the oven
+Cook 3: Order 48 placed in the oven
+Cook 4: Cooking order 49
+Cook 3: Removing order 48 from the oven
+Cook 3: Order 48 removed from the oven
+Cook 3: Order 48 cooked
+Cook 840974464: Placing order 38 in the oven
+Moto 840974496: Order 26 delivered
+Cook 840974464: Order 38 placed in the oven
+Moto 840974496: Order 41 delivered
+Cook 840974464: Placing order 46 in the oven
+Cook 840974464: Order 46 placed in the oven
+Cook 840974464: Removing order 46 from the oven
+Cook 840974464: Order 46 removed from the oven
+Cook 840974464: Order 46 cooked
+Moto 840974496: Delivering orders
+Moto 4: Delivering orders
+Moto 840974496: Order 46 delivered
+Cook 840974464: Removing order 38 from the oven
+Cook 840974464: Order 38 removed from the oven
+Cook 840974464: Order 38 cooked
+Moto 840974496: Order 42 delivered
+Moto 840974496: Order 45 delivered
+Cook 4: Placing order 49 in the oven
+Cook 4: Order 49 placed in the oven
+Cook 4: Removing order 49 from the oven
+Cook 4: Order 49 removed from the oven
+Cook 4: Order 49 cooked
+Moto 4: Order 48 delivered
+Moto 4: Order 44 delivered
+Moto 4: Order 47 delivered
+Moto 6: Delivering orders
+Moto 6: Order 49 delivered
+Moto 6: Order 38 delivered
+Accepted new client connection
+Accepted new client connection
+Received order 0 from client 0.00 2.63
+Accepted new client connection
+Accepted new client connection
+Received order 1 from client 7.56 9.17
+Cook 840974464: Cooking order 0
+Received order 3 from client 0.47 13.58
+Received order 2 from client 5.33 4.38
+Cook 840974464: Cooking order 2
+Cook 840974464: Cooking order 1
+Cook 840974464: Placing order 0 in the oven
+Cook 840974464: Order 0 placed in the oven
+Cook 840974464: Removing order 0 from the oven
+Cook 840974464: Order 0 removed from the oven
+Cook 840974464: Order 0 cooked
+Cook 840974464: Cooking order 3
+Accepted new client connection
+Accepted new client connection
+Cook 840974464: Placing order 1 in the oven
+Accepted new client connection
+Accepted new client connection
+Received order 6 from client 8.31 0.69
+Received order 4 from client 6.79 18.69
+Cook 1: Cooking order 6
+Received order 5 from client 3.84 10.39
+Cook 840974464: Order 1 placed in the oven
+Cook 840974464: Removing order 1 from the oven
+Cook 840974464: Order 1 removed from the oven
+Cook 840974464: Order 1 cooked
+Cook 840974464: Placing order 3 in the oven
+Cook 840974464: Placing order 2 in the oven
+Cook 840974464: Order 2 placed in the oven
+Cook 840974464: Removing order 2 from the oven
+Cook 840974464: Order 2 removed from the oven
+Accepted new client connection
+Accepted new client connection
+Cook 840974464: Order 3 placed in the oven
+Cook 2: Cooking order 5
+Received order 9 from client 3.83 1.34
+Cook 4: Cooking order 4
+Received order 8 from client 6.71 0.15
+Accepted new client connection
+Accepted new client connection
+Cook 1: Placing order 6 in the oven
+Cook 840974464: Removing order 3 from the oven
+Cook 840974464: Order 3 removed from the oven
+Cook 840974464: Order 3 cooked
+Moto 840974496: Delivering orders
+Received order 7 from client 0.53 10.59
+Cook 4: Placing order 4 in the oven
+Cook 3: Cooking order 7
+Received order 11 from client 5.89 18.61
+Cook 1: Order 6 placed in the oven
+Cook 1: Removing order 6 from the oven
+Cook 1: Order 6 removed from the oven
+Cook 1: Order 6 cooked
+Moto 840974496: Order 3 delivered
+Received order 10 from client 4.17 13.74
+Cook 2: Placing order 5 in the oven
+Accepted new client connection
+Cook 4: Order 4 placed in the oven
+Received order 12 from client 8.46 10.54
+Cook 840974464: Order 2 cooked
+Cook 840974464: Cooking order 12
+Cook 840974464: Cooking order 8
+Moto 840974496: Order 1 delivered
+Cook 1: Cooking order 10
+Cook 2: Order 5 placed in the oven
+Cook 2: Removing order 5 from the oven
+Cook 2: Order 5 removed from the oven
+Cook 2: Order 5 cooked
+Cook 840974464: Cooking order 11
+Moto 840974496: Delivering orders
+Moto 840974496: Order 0 delivered
+Moto 840974496: Order 5 delivered
+Accepted new client connection
+Moto 840974496: Order 2 delivered
+Received order 13 from client 0.92 13.08
+Cook 3: Placing order 7 in the oven
+Accepted new client connection
+Accepted new client connection
+Moto 840974496: Order 6 delivered
+Accepted new client connection
+Cook 4: Removing order 4 from the oven
+Cook 4: Order 4 removed from the oven
+Cook 2: Cooking order 13
+Received order 14 from client 4.16 14.02
+Cook 840974464: Cooking order 9
+Received order 15 from client 9.10 15.24
+Accepted new client connection
+Cook 840974464: Placing order 8 in the oven
+Accepted new client connection
+Cook 3: Order 7 placed in the oven
+Cook 1: Placing order 10 in the oven
+Cook 1: Order 10 placed in the oven
+Received order 17 from client 7.36 6.56
+Received order 16 from client 2.62 0.95
+Accepted new client connection
+Accepted new client connection
+Cook 840974464: Order 8 placed in the oven
+Cook 3: Removing order 7 from the oven
+Cook 3: Order 7 removed from the oven
+Cook 840974464: Placing order 12 in the oven
+Cook 840974464: Order 12 placed in the oven
+Received order 19 from client 9.91 7.31
+Received order 18 from client 6.33 15.13
+Received order 20 from client 2.47 19.65
+Cook 4: Order 4 cooked
+Cook 4: Cooking order 20
+Cook 840974464: Placing order 11 in the oven
+Cook 840974464: Order 11 placed in the oven
+Accepted new client connection
+Cook 840974464: Removing order 8 from the oven
+Cook 840974464: Order 8 removed from the oven
+Cook 840974464: Order 8 cooked
+Cook 840974464: Cooking order 18
+Cook 2: Placing order 13 in the oven
+Accepted new client connection
+Received order 21 from client 7.23 15.07
+Cook 1: Removing order 10 from the oven
+Cook 1: Order 10 removed from the oven
+Cook 1: Order 10 cooked
+Cook 1: Cooking order 21
+Cook 2: Order 13 placed in the oven
+Cook 3: Order 7 cooked
+Cook 3: Cooking order 19
+Cook 840974464: Placing order 9 in the oven
+Cook 840974464: Order 9 placed in the oven
+Cook 4: Placing order 20 in the oven
+Received order 22 from client 6.52 1.45
+Cook 840974464: Removing order 11 from the oven
+Cook 840974464: Order 11 removed from the oven
+Accepted new client connection
+Moto 840974496: Delivering orders
+Cook 4: Order 20 placed in the oven
+Moto 840974496: Order 10 delivered
+Cook 840974464: Order 11 cooked
+Cook 840974464: Cooking order 22
+Received order 23 from client 6.32 17.69
+Accepted new client connection
+Cook 840974464: Removing order 9 from the oven
+Cook 840974464: Order 9 removed from the oven
+Accepted new client connection
+Moto 840974496: Order 8 delivered
+Cook 840974464: Order 9 cooked
+Cook 840974464: Removing order 12 from the oven
+Cook 840974464: Order 12 removed from the oven
+Cook 840974464: Order 12 cooked
+Cook 4: Removing order 20 from the oven
+Cook 4: Order 20 removed from the oven
+Cook 4: Order 20 cooked
+Cook 1: Placing order 21 in the oven
+Cook 1: Order 21 placed in the oven
+Moto 4: Delivering orders
+Cook 3: Placing order 19 in the oven
+Moto 4: Order 9 delivered
+Moto 4: Order 11 delivered
+Cook 840974464: Cooking order 16
+Accepted new client connection
+Moto 840974496: Order 4 delivered
+Received order 25 from client 7.66 9.55
+Cook 4: Cooking order 17
+Cook 840974464: Cooking order 23
+Cook 2: Removing order 13 from the oven
+Cook 2: Order 13 removed from the oven
+Cook 2: Order 13 cooked
+Cook 2: Cooking order 25
+Received order 24 from client 2.73 8.73
+Received order 26 from client 2.38 5.50
+Accepted new client connection
+Cook 3: Order 19 placed in the oven
+Cook 1: Removing order 21 from the oven
+Cook 1: Order 21 removed from the oven
+Cook 1: Order 21 cooked
+Moto 4: Order 7 delivered
+Accepted new client connection
+Accepted new client connection
+Cook 840974464: Placing order 16 in the oven
+Cook 840974464: Order 16 placed in the oven
+Cook 1: Cooking order 26
+Cook 4: Placing order 17 in the oven
+Received order 27 from client 3.59 3.33
+Cook 840974464: Placing order 18 in the oven
+Cook 840974464: Order 18 placed in the oven
+Accepted new client connection
+Received order 29 from client 9.09 1.21
+Received order 30 from client 9.05 10.09
+Received order 28 from client 4.87 17.95
+Moto 840974496: Delivering orders
+Cook 4: Order 17 placed in the oven
+Accepted new client connection
+Cook 840974464: Placing order 22 in the oven
+Cook 3: Removing order 19 from the oven
+Cook 3: Order 19 removed from the oven
+Moto 840974496: Order 13 delivered
+Accepted new client connection
+Cook 840974464: Order 22 placed in the oven
+Received order 31 from client 5.16 6.38
+Received order 32 from client 9.87 9.88
+Cook 3: Order 19 cooked
+Cook 3: Cooking order 32
+Cook 840974464: Placing order 23 in the oven
+Cook 840974464: Order 23 placed in the oven
+Accepted new client connection
+Cook 4: Removing order 17 from the oven
+Cook 4: Order 17 removed from the oven
+Cook 4: Order 17 cooked
+Cook 4: Cooking order 31
+Cook 2: Placing order 25 in the oven
+Cook 2: Order 25 placed in the oven
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Moto 840974496: Delivering orders
+Moto 840974496: Order 17 delivered
+Moto 840974496: Order 19 delivered
+Moto 840974496: Order 21 delivered
+Cook 840974464: Removing order 16 from the oven
+Cook 840974464: Order 16 removed from the oven
+Cook 840974464: Order 16 cooked
+Received order 35 from client 5.01 7.68
+Received order 36 from client 2.77 18.28
+Received order 37 from client 5.30 9.29
+Received order 38 from client 9.41 1.00
+Received order 40 from client 8.28 2.51
+Received order 41 from client 0.16 13.77
+Received order 43 from client 7.36 14.51
+Received order 33 from client 2.66 1.81
+Moto 840974496: Order 20 delivered
+Cook 840974464: Removing order 18 from the oven
+Cook 840974464: Order 18 removed from the oven
+Cook 840974464: Order 18 cooked
+Cook 840974464: Cooking order 33
+Cook 840974464: Removing order 23 from the oven
+Cook 840974464: Order 23 removed from the oven
+Cook 840974464: Order 23 cooked
+Cook 840974464: Removing order 22 from the oven
+Cook 2: Removing order 25 from the oven
+Cook 840974464: Cooking order 28
+Received order 39 from client 7.62 15.40
+Received order 44 from client 9.99 17.77
+Received order 42 from client 8.68 12.59
+Received order 45 from client 2.33 6.13
+Received order 46 from client 3.51 10.27
+Received order 48 from client 4.12 16.83
+Received order 47 from client 5.91 16.92
+Cook 1: Placing order 26 in the oven
+Cook 1: Order 26 placed in the oven
+Received order 49 from client 2.69 8.31
+Cook 840974464: Cooking order 43
+Moto 840974496: Order 12 delivered
+Cook 840974464: Order 22 removed from the oven
+Cook 840974464: Order 22 cooked
+Cook 2: Order 25 removed from the oven
+Cook 3: Placing order 32 in the oven
+Cook 3: Order 32 placed in the oven
+Cook 840974464: Cooking order 49
+Cook 2: Order 25 cooked
+Cook 2: Cooking order 47
+Received order 34 from client 9.48 1.47
+Moto 840974496: Delivering orders
+Cook 4: Placing order 31 in the oven
+Cook 4: Order 31 placed in the oven
+Moto 840974496: Order 23 delivered
+Cook 840974464: Placing order 33 in the oven
+Cook 840974464: Order 33 placed in the oven
+Cook 1: Removing order 26 from the oven
+Cook 1: Order 26 removed from the oven
+Cook 1: Order 26 cooked
+Cook 840974464: Placing order 43 in the oven
+Moto 5: Delivering orders
+Moto 5: Order 26 delivered
+Moto 5: Order 25 delivered
+Moto 5: Order 22 delivered
+Moto 840974496: Order 18 delivered
+Cook 3: Removing order 32 from the oven
+Cook 3: Order 32 removed from the oven
+Cook 840974464: Order 43 placed in the oven
+Moto 840974496: Order 16 delivered
+Cook 1: Cooking order 34
+Cook 840974464: Placing order 28 in the oven
+Cook 840974464: Order 28 placed in the oven
+Cook 840974464: Removing order 33 from the oven
+Cook 840974464: Order 33 removed from the oven
+Cook 840974464: Order 33 cooked
+Cook 3: Order 32 cooked
+Cook 4: Removing order 31 from the oven
+Cook 4: Order 31 removed from the oven
+Cook 4: Order 31 cooked
+Cook 2: Placing order 47 in the oven
+Cook 2: Order 47 placed in the oven
+Cook 840974464: Placing order 49 in the oven
+Moto 840974496: Delivering orders
+Moto 840974496: Order 31 delivered
+Moto 840974496: Order 32 delivered
+Moto 840974496: Order 33 delivered
+Cook 840974464: Cooking order 48
+Cook 840974464: Removing order 43 from the oven
+Cook 840974464: Order 43 removed from the oven
+Cook 840974464: Order 43 cooked
+Cook 840974464: Cooking order 42
+Cook 4: Cooking order 45
+Cook 840974464: Order 49 placed in the oven
+Cook 3: Cooking order 46
+Cook 2: Removing order 47 from the oven
+Cook 2: Order 47 removed from the oven
+Cook 2: Order 47 cooked
+Cook 2: Cooking order 44
+Cook 840974464: Removing order 28 from the oven
+Cook 840974464: Order 28 removed from the oven
+Cook 840974464: Order 28 cooked
+Cook 840974464: Cooking order 39
+Cook 1: Placing order 34 in the oven
+Cook 1: Order 34 placed in the oven
+Cook 840974464: Removing order 49 from the oven
+Cook 840974464: Order 49 removed from the oven
+Cook 840974464: Order 49 cooked
+Cook 840974464: Cooking order 41
+Moto 840974496: Delivering orders
+Cook 840974464: Placing order 48 in the oven
+Cook 840974464: Order 48 placed in the oven
+Cook 1: Removing order 34 from the oven
+Cook 1: Order 34 removed from the oven
+Cook 1: Order 34 cooked
+Cook 1: Cooking order 40
+Cook 3: Placing order 46 in the oven
+Cook 3: Order 46 placed in the oven
+Cook 4: Placing order 45 in the oven
+Cook 4: Order 45 placed in the oven
+Cook 840974464: Placing order 39 in the oven
+Cook 840974464: Removing order 48 from the oven
+Cook 840974464: Order 48 removed from the oven
+Cook 2: Placing order 44 in the oven
+Cook 840974464: Placing order 42 in the oven
+Cook 840974464: Order 42 placed in the oven
+Cook 2: Order 44 placed in the oven
+Cook 840974464: Order 39 placed in the oven
+Cook 840974464: Order 48 cooked
+Cook 840974464: Cooking order 38
+Cook 4: Removing order 45 from the oven
+Cook 4: Order 45 removed from the oven
+Cook 4: Order 45 cooked
+Cook 1: Placing order 40 in the oven
+Cook 4: Cooking order 37
+Cook 3: Removing order 46 from the oven
+Cook 3: Order 46 removed from the oven
+Cook 3: Order 46 cooked
+Cook 3: Cooking order 36
+Cook 840974464: Removing order 42 from the oven
+Cook 840974464: Order 42 removed from the oven
+Cook 840974464: Order 42 cooked
+Cook 840974464: Cooking order 35
+Moto 1: Delivering orders
+Moto 2: Delivering orders
+Moto 1: Order 48 delivered
+Cook 1: Order 40 placed in the oven
+Cook 2: Removing order 44 from the oven
+Cook 2: Order 44 removed from the oven
+Cook 2: Order 44 cooked
+Cook 2: Cooking order 30
+Cook 840974464: Placing order 41 in the oven
+Cook 840974464: Order 41 placed in the oven
+Cook 4: Placing order 37 in the oven
+Moto 2: Order 42 delivered
+Moto 2: Order 46 delivered
+Moto 2: Order 45 delivered
+Moto 1: Order 34 delivered
+Moto 1: Order 49 delivered
+Cook 840974464: Placing order 38 in the oven
+Cook 840974464: Order 38 placed in the oven
+Cook 840974464: Removing order 39 from the oven
+Cook 840974464: Order 39 removed from the oven
+Cook 840974464: Order 39 cooked
+Cook 840974464: Cooking order 29
+Cook 4: Order 37 placed in the oven
+Cook 840974464: Removing order 41 from the oven
+Cook 840974464: Order 41 removed from the oven
+Cook 840974464: Order 41 cooked
+Cook 840974464: Removing order 38 from the oven
+Cook 840974464: Order 38 removed from the oven
+Cook 840974464: Order 38 cooked
+Cook 840974464: Cooking order 24
+Cook 4: Removing order 37 from the oven
+Cook 4: Order 37 removed from the oven
+Cook 4: Order 37 cooked
+Cook 4: Cooking order 15
+Moto 4: Delivering orders
+Cook 840974464: Placing order 35 in the oven
+Cook 840974464: Order 35 placed in the oven
+Cook 1: Removing order 40 from the oven
+Cook 1: Order 40 removed from the oven
+Cook 1: Order 40 cooked
+Cook 1: Cooking order 14
+Cook 3: Placing order 36 in the oven
+Cook 3: Order 36 placed in the oven
+Cook 3: Removing order 36 from the oven
+Cook 3: Order 36 removed from the oven
+Cook 3: Order 36 cooked
+Moto 3: Delivering orders
+Moto 3: Order 40 delivered
+Cook 840974464: Removing order 35 from the oven
+Cook 840974464: Order 35 removed from the oven
+Cook 840974464: Placing order 29 in the oven
+Cook 840974464: Order 29 placed in the oven
+Moto 3: Order 37 delivered
+Moto 3: Order 38 delivered
+Cook 840974464: Order 35 cooked
+Cook 840974464: Placing order 24 in the oven
+Cook 840974464: Order 24 placed in the oven
+Cook 4: Placing order 15 in the oven
+Cook 4: Order 15 placed in the oven
+Cook 840974464: Cooking order 27
+Cook 2: Placing order 30 in the oven
+Cook 2: Order 30 placed in the oven
+Cook 840974464: Removing order 29 from the oven
+Cook 840974464: Order 29 removed from the oven
+Cook 840974464: Order 29 cooked
+Cook 1: Placing order 14 in the oven
+Cook 1: Order 14 placed in the oven
+Cook 4: Removing order 15 from the oven
+Cook 4: Order 15 removed from the oven
+Cook 4: Order 15 cooked
+Cook 840974464: Removing order 24 from the oven
+Cook 840974464: Order 24 removed from the oven
+Cook 1: Removing order 14 from the oven
+Cook 1: Order 14 removed from the oven
+Cook 1: Order 14 cooked
+Cook 2: Removing order 30 from the oven
+Cook 2: Order 30 removed from the oven
+Cook 2: Order 30 cooked
+Cook 840974464: Placing order 27 in the oven
+Cook 840974464: Order 27 placed in the oven
+Cook 840974464: Removing order 27 from the oven
+Cook 840974464: Order 27 removed from the oven
+Cook 840974464: Order 27 cooked
+Cook 840974464: Order 24 cooked
+Moto 840974496: Delivering orders
+Moto 840974496: Order 29 delivered
+Moto 840974496: Order 35 delivered
+Moto 840974496: Order 36 delivered
+Moto 1: Delivering orders
+Moto 1: Order 27 delivered
+Moto 1: Order 30 delivered
+Moto 1: Order 14 delivered
+Moto 840974496: Order 28 delivered
+Moto 840974496: Order 47 delivered
+Moto 840974496: Order 43 delivered
+Moto 4: Order 41 delivered
+Moto 4: Order 39 delivered
+Moto 4: Order 44 delivered
+Accepted new client connection
+Received order 0 from client Client 0
+Order 0: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 1 from client Client 1
+Order 1: Cancelled
+Received order 2 from client Client 2
+Order 2: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 3 from client Client 3
+Order 3: Cancelled
+Received order 4 from client Client 4
+Order 4: Cancelled
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Received order 5 from client Client 5
+Order 5: Cancelled
+Received order 6 from client Client 6
+Order 6: Cancelled
+Received order 7 from client Client 7
+Order 7: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 8 from client Client 8
+Order 8: Cancelled
+Received order 9 from client Client 9
+Order 9: Cancelled
+Accepted new client connection
+Received order 10 from client Client 10
+Order 10: Cancelled
+Accepted new client connection
+Received order 11 from client Client 11
+Order 11: Cancelled
+Accepted new client connection
+Received order 12 from client Client 12
+Order 12: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 13 from client Client 13
+Order 13: Cancelled
+Received order 14 from client Client 14
+Order 14: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 15 from client Client 15
+Order 15: Cancelled
+Received order 16 from client Client 16
+Order 16: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 18 from client Client 18
+Order 18: Cancelled
+Received order 17 from client Client 17
+Order 17: Cancelled
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Received order 19 from client Client 19
+Received order 20 from client Client 20
+Order 20: Cancelled
+Received order 21 from client Client 21
+Order 21: Cancelled
+Accepted new client connection
+Order 19: Cancelled
+Received order 22 from client Client 22
+Order 22: Cancelled
+Accepted new client connection
+Received order 23 from client Client 23
+Order 23: Cancelled
+Accepted new client connection
+Received order 24 from client Client 24
+Order 24: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 25 from client Client 25
+Order 25: Cancelled
+Received order 26 from client Client 26
+Order 26: Cancelled
+Accepted new client connection
+Received order 27 from client Client 27
+Order 27: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 28 from client Client 28
+Order 28: Cancelled
+Received order 29 from client Client 29
+Order 29: Cancelled
+Accepted new client connection
+Received order 30 from client Client 30
+Order 30: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 31 from client Client 31
+Order 31: Cancelled
+Accepted new client connection
+Received order 33 from client Client 33
+Order 33: Cancelled
+Received order 32 from client Client 32
+Order 32: Cancelled
+Accepted new client connection
+Received order 34 from client Client 34
+Order 34: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 35 from client Client 35
+Order 35: Cancelled
+Received order 36 from client Client 36
+Order 36: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 37 from client Client 37
+Order 37: Cancelled
+Received order 38 from client Client 38
+Order 38: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 39 from client Client 39
+Order 39: Cancelled
+Received order 40 from client Client 40
+Order 40: Cancelled
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Received order 41 from client Client 41
+Order 41: Cancelled
+Received order 42 from client Client 42
+Order 42: Cancelled
+Received order 43 from client Client 43
+Order 43: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 44 from client Client 44
+Order 44: Cancelled
+Received order 45 from client Client 45
+Order 45: Cancelled
+Accepted new client connection
+Received order 46 from client Client 46
+Order 46: Cancelled
+Accepted new client connection
+Received order 47 from client Client 47
+Order 47: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 48 from client Client 48
+Order 48: Cancelled
+Received order 49 from client Client 49
+Order 49: Cancelled
+Moto 5: Delivering orders
+Moto 5: Order 24 delivered
+Moto 5: Order 15 delivered
+Accepted new client connection
+Accepted new client connection
+Received order 0 from client 0.00 2.63
+Accepted new client connection
+Accepted new client connection
+Received order 1 from client 7.56 9.17
+Received order 2 from client 5.33 4.38
+Cook 2: Cooking order 0
+Cook 840974464: Cooking order 1
+Accepted new client connection
+Cook 2: Placing order 0 in the oven
+Cook 2: Order 0 placed in the oven
+Cook 2: Removing order 0 from the oven
+Cook 2: Order 0 removed from the oven
+Cook 2: Order 0 cooked
+Cook 840974464: Placing order 1 in the oven
+Received order 3 from client 0.47 13.58
+Accepted new client connection
+Cook 3: Cooking order 2
+Cook 840974464: Order 1 placed in the oven
+Received order 5 from client 3.84 10.39
+Accepted new client connection
+Received order 4 from client 6.79 18.69
+Cook 840974464: Cooking order 5
+Accepted new client connection
+Cook 2: Cooking order 3
+Cook 840974464: Removing order 1 from the oven
+Cook 840974464: Order 1 removed from the oven
+Received order 7 from client 0.53 10.59
+Cook 3: Placing order 2 in the oven
+Cook 3: Order 2 placed in the oven
+Cook 3: Removing order 2 from the oven
+Cook 3: Order 2 removed from the oven
+Cook 3: Order 2 cooked
+Cook 4: Cooking order 4
+Accepted new client connection
+Received order 6 from client 8.31 0.69
+Cook 840974464: Order 1 cooked
+Cook 840974464: Placing order 5 in the oven
+Cook 2: Placing order 3 in the oven
+Cook 2: Order 3 placed in the oven
+Cook 2: Removing order 3 from the oven
+Cook 2: Order 3 removed from the oven
+Cook 2: Order 3 cooked
+Cook 4: Placing order 4 in the oven
+Cook 4: Order 4 placed in the oven
+Cook 4: Removing order 4 from the oven
+Cook 4: Order 4 removed from the oven
+Cook 4: Order 4 cooked
+Cook 1: Cooking order 7
+Moto 840974496: Delivering orders
+Moto 840974496: Order 4 delivered
+Cook 840974464: Order 5 placed in the oven
+Cook 840974464: Removing order 5 from the oven
+Cook 840974464: Order 5 removed from the oven
+Cook 840974464: Order 5 cooked
+Received order 8 from client 6.71 0.15
+Accepted new client connection
+Cook 3: Cooking order 6
+Moto 840974496: Order 3 delivered
+Moto 840974496: Order 1 delivered
+Cook 1: Placing order 7 in the oven
+Cook 1: Order 7 placed in the oven
+Cook 1: Removing order 7 from the oven
+Cook 1: Order 7 removed from the oven
+Cook 1: Order 7 cooked
+Cook 1: Cooking order 8
+Received order 9 from client 3.83 1.34
+Cook 3: Placing order 6 in the oven
+Cook 3: Order 6 placed in the oven
+Cook 3: Removing order 6 from the oven
+Cook 3: Order 6 removed from the oven
+Cook 3: Order 6 cooked
+Moto 6: Delivering orders
+Moto 6: Order 5 delivered
+Moto 6: Order 2 delivered
+Moto 6: Order 0 delivered
+Cook 840974464: Cooking order 9
+Cook 840974464: Placing order 9 in the oven
+Cook 840974464: Order 9 placed in the oven
+Cook 840974464: Removing order 9 from the oven
+Cook 840974464: Order 9 removed from the oven
+Cook 840974464: Order 9 cooked
+Cook 1: Placing order 8 in the oven
+Cook 1: Order 8 placed in the oven
+Cook 1: Removing order 8 from the oven
+Cook 1: Order 8 removed from the oven
+Cook 1: Order 8 cooked
+Moto 840974496: Delivering orders
+Moto 840974496: Order 9 delivered
+Moto 840974496: Order 6 delivered
+Moto 840974496: Order 7 delivered
+Accepted new client connection
+Received order 0 from client Client 0
+Order 0: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 1 from client Client 1
+Received order 2 from client Client 2
+Order 2: Cancelled
+Order 1: Cancelled
+Accepted new client connection
+Accepted new client connection
+Received order 3 from client Client 3
+Received order 4 from client Client 4
+Accepted new client connection
+Order 3: Cancelled
+Order 4: Cancelled
+Accepted new client connection
+Received order 5 from client Client 5
+Order 5: Cancelled
+Accepted new client connection
+Received order 6 from client Client 6
+Order 6: Cancelled
+Accepted new client connection
+Received order 7 from client Client 7
+Order 7: Cancelled
+Accepted new client connection
+Received order 8 from client Client 8
+Order 8: Cancelled
+Received order 9 from client Client 9
+Order 9: Cancelled
+Moto 4: Delivering orders
+Moto 4: Order 8 delivered
+Server started
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Received order 0 from client 0.00 2.63
+Accepted new client connection
+Accepted new client connection
+Received order 1 from client 7.56 9.17
+Received order 2 from client 5.33 4.38
+Received order 3 from client 0.47 13.58
+Cook 2: Cooking order 0
+Cook 887119456: Cooking order 2
+Cook 887119456: Cooking order 1
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Cook 2: Placing order 0 in the oven
+Cook 2: Order 0 placed in the oven
+Cook 887119456: Cooking order 3
+Received order 5 from client 3.84 10.39
+Accepted new client connection
+Received order 4 from client 6.79 18.69
+Received order 7 from client 0.53 10.59
+Accepted new client connection
+Cook 2: Removing order 0 from the oven
+Cook 2: Order 0 removed from the oven
+Cook 2: Order 0 cooked
+Cook 887119456: Placing order 2 in the oven
+Cook 887119456: Order 2 placed in the oven
+Cook 887119456: Removing order 2 from the oven
+Cook 887119456: Order 2 removed from the oven
+Cook 887119456: Order 2 cooked
+Cook 3: Cooking order 4
+Cook 887119456: Cooking order 5
+Received order 9 from client 3.83 1.34
+Cook 887119456: Placing order 1 in the oven
+Cook 887119456: Order 1 placed in the oven
+Accepted new client connection
+Accepted new client connection
+Cook 887119456: Placing order 3 in the oven
+Cook 887119456: Order 3 placed in the oven
+Cook 887119456: Removing order 3 from the oven
+Cook 887119456: Order 3 removed from the oven
+Cook 887119456: Order 3 cooked
+Cook 887119456: Placing order 5 in the oven
+Cook 887119456: Order 5 placed in the oven
+Received order 8 from client 6.71 0.15
+Received order 6 from client 8.31 0.69
+Cook 887119456: Removing order 1 from the oven
+Cook 887119456: Order 1 removed from the oven
+Cook 887119456: Cooking order 8
+Cook 2: Cooking order 9
+Received order 10 from client 4.17 13.74
+Received order 11 from client 5.89 18.61
+Cook 887119456: Order 1 cooked
+Cook 887119456: Cooking order 11
+Moto 887118784: Delivering orders
+Moto 887118784: Order 3 delivered
+Cook 4: Cooking order 7
+Cook 887119456: Cooking order 6
+Cook 3: Placing order 4 in the oven
+Cook 3: Order 4 placed in the oven
+Accepted new client connection
+Accepted new client connection
+Cook 887119456: Removing order 5 from the oven
+Cook 887119456: Order 5 removed from the oven
+Cook 887119456: Order 5 cooked
+Cook 887119456: Cooking order 10
+Moto 887118784: Order 2 delivered
+Received order 13 from client 0.92 13.08
+Cook 887119456: Placing order 8 in the oven
+Received order 12 from client 8.46 10.54
+Cook 887119456: Order 8 placed in the oven
+Accepted new client connection
+Cook 3: Removing order 4 from the oven
+Cook 3: Order 4 removed from the oven
+Cook 887119456: Placing order 11 in the oven
+Cook 2: Placing order 9 in the oven
+Cook 2: Order 9 placed in the oven
+Cook 3: Order 4 cooked
+Received order 14 from client 4.16 14.02
+Accepted new client connection
+Cook 4: Placing order 7 in the oven
+Received order 15 from client 9.10 15.24
+Cook 4: Order 7 placed in the oven
+Moto 887118784: Order 0 delivered
+Cook 887119456: Removing order 8 from the oven
+Cook 887119456: Order 8 removed from the oven
+Cook 3: Cooking order 13
+Accepted new client connection
+Cook 2: Removing order 9 from the oven
+Cook 2: Order 9 removed from the oven
+Cook 887119456: Order 11 placed in the oven
+Cook 887119456: Order 8 cooked
+Cook 887119456: Cooking order 15
+Accepted new client connection
+Cook 2: Order 9 cooked
+Accepted new client connection
+Received order 17 from client 7.36 6.56
+Cook 887119456: Placing order 10 in the oven
+Cook 887119456: Order 10 placed in the oven
+Cook 887119456: Removing order 11 from the oven
+Cook 887119456: Order 11 removed from the oven
+Cook 887119456: Order 11 cooked
+Cook 887119456: Cooking order 17
+Moto 3: Delivering orders
+Moto 3: Order 11 delivered
+Moto 3: Order 9 delivered
+Received order 16 from client 2.62 0.95
+Received order 18 from client 6.33 15.13
+Cook 4: Removing order 7 from the oven
+Cook 4: Order 7 removed from the oven
+Cook 2: Cooking order 14
+Cook 4: Order 7 cooked
+Cook 4: Cooking order 18
+Moto 3: Order 8 delivered
+Moto 887118784: Delivering orders
+Moto 887118784: Order 4 delivered
+Moto 887118784: Order 5 delivered
+Moto 887118784: Order 1 delivered
+Cook 887119456: Removing order 10 from the oven
+Cook 887119456: Order 10 removed from the oven
+Cook 887119456: Order 10 cooked
+Cook 887119456: Cooking order 16
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Cook 887119456: Placing order 17 in the oven
+Cook 887119456: Order 17 placed in the oven
+Cook 3: Placing order 13 in the oven
+Cook 887119456: Placing order 6 in the oven
+Received order 20 from client 2.47 19.65
+Accepted new client connection
+Received order 21 from client 7.23 15.07
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Received order 19 from client 9.91 7.31
+Received order 24 from client 2.73 8.73
+Received order 22 from client 6.52 1.45
+Received order 26 from client 2.38 5.50
+Cook 887119456: Placing order 15 in the oven
+Cook 887119456: Order 6 placed in the oven
+Received order 27 from client 3.59 3.33
+Cook 887119456: Placing order 16 in the oven
+Cook 887119456: Order 15 placed in the oven
+Cook 3: Order 13 placed in the oven
+Received order 25 from client 7.66 9.55
+Cook 1: Cooking order 12
+Cook 887119456: Order 16 placed in the oven
+Accepted new client connection
+Accepted new client connection
+Cook 887119456: Removing order 6 from the oven
+Cook 887119456: Order 6 removed from the oven
+Cook 887119456: Order 6 cooked
+Cook 887119456: Removing order 15 from the oven
+Cook 887119456: Order 15 removed from the oven
+Cook 887119456: Order 15 cooked
+Received order 29 from client 9.09 1.21
+Cook 887119456: Cooking order 25
+Cook 887119456: Removing order 17 from the oven
+Cook 887119456: Order 17 removed from the oven
+Cook 887119456: Order 17 cooked
+Cook 887119456: Removing order 16 from the oven
+Cook 887119456: Order 16 removed from the oven
+Received order 28 from client 4.87 17.95
+Cook 3: Removing order 13 from the oven
+Cook 3: Order 13 removed from the oven
+Cook 3: Order 13 cooked
+Cook 3: Cooking order 28
+Moto 887118784: Delivering orders
+Moto 1: Delivering orders
+Moto 1: Order 6 delivered
+Moto 1: Order 10 delivered
+Moto 887118784: Order 13 delivered
+Moto 887118784: Order 17 delivered
+Moto 887118784: Order 15 delivered
+Cook 887119456: Placing order 25 in the oven
+Cook 887119456: Order 25 placed in the oven
+Cook 887119456: Removing order 25 from the oven
+Cook 887119456: Order 25 removed from the oven
+Cook 887119456: Order 25 cooked
+Cook 887119456: Cooking order 26
+Cook 4: Placing order 18 in the oven
+Cook 4: Order 18 placed in the oven
+Cook 4: Removing order 18 from the oven
+Cook 4: Order 18 removed from the oven
+Cook 4: Order 18 cooked
+Cook 4: Cooking order 22
+Received order 23 from client 6.32 17.69
+Cook 887119456: Cooking order 29
+Moto 1: Order 7 delivered
+Cook 887119456: Order 16 cooked
+Cook 3: Placing order 28 in the oven
+Cook 3: Order 28 placed in the oven
+Cook 3: Removing order 28 from the oven
+Accepted new client connection
+Cook 887119456: Cooking order 27
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Cook 887119456: Placing order 26 in the oven
+Cook 887119456: Order 26 placed in the oven
+Cook 887119456: Cooking order 23
+Cook 4: Placing order 22 in the oven
+Cook 2: Placing order 14 in the oven
+Cook 2: Order 14 placed in the oven
+Moto 4: Delivering orders
+Moto 4: Order 16 delivered
+Received order 32 from client 9.87 9.88
+Moto 4: Order 18 delivered
+Moto 4: Order 25 delivered
+Received order 33 from client 2.66 1.81
+Received order 34 from client 9.48 1.47
+Received order 37 from client 5.30 9.29
+Received order 36 from client 2.77 18.28
+Received order 31 from client 5.16 6.38
+Cook 4: Order 22 placed in the oven
+Cook 3: Order 28 removed from the oven
+Cook 3: Order 28 cooked
+Cook 3: Cooking order 31
+Received order 38 from client 9.41 1.00
+Received order 39 from client 7.62 15.40
+Received order 40 from client 8.28 2.51
+Received order 30 from client 9.05 10.09
+Received order 35 from client 5.01 7.68
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Cook 887119456: Removing order 26 from the oven
+Cook 887119456: Order 26 removed from the oven
+Cook 887119456: Order 26 cooked
+Cook 887119456: Cooking order 35
+Cook 2: Removing order 14 from the oven
+Cook 2: Order 14 removed from the oven
+Received order 42 from client 8.68 12.59
+Received order 41 from client 0.16 13.77
+Cook 4: Removing order 22 from the oven
+Cook 4: Order 22 removed from the oven
+Cook 4: Order 22 cooked
+Cook 4: Cooking order 30
+Cook 2: Order 14 cooked
+Cook 2: Cooking order 40
+Cook 887119456: Placing order 29 in the oven
+Cook 887119456: Order 29 placed in the oven
+Cook 887119456: Placing order 27 in the oven
+Cook 887119456: Order 27 placed in the oven
+Received order 43 from client 7.36 14.51
+Accepted new client connection
+Cook 887119456: Placing order 23 in the oven
+Cook 887119456: Order 23 placed in the oven
+Cook 3: Placing order 31 in the oven
+Cook 3: Order 31 placed in the oven
+Cook 887119456: Removing order 29 from the oven
+Cook 887119456: Order 29 removed from the oven
+Cook 887119456: Order 29 cooked
+Cook 887119456: Cooking order 41
+Moto 3: Delivering orders
+Moto 3: Order 14 delivered
+Moto 3: Order 22 delivered
+Moto 3: Order 26 delivered
+Cook 887119456: Removing order 23 from the oven
+Cook 887119456: Order 23 removed from the oven
+Cook 887119456: Order 23 cooked
+Cook 887119456: Cooking order 43
+Cook 887119456: Removing order 27 from the oven
+Cook 887119456: Order 27 removed from the oven
+Cook 887119456: Order 27 cooked
+Cook 887119456: Cooking order 42
+Received order 44 from client 9.99 17.77
+Accepted new client connection
+Accepted new client connection
+Cook 2: Placing order 40 in the oven
+Cook 2: Order 40 placed in the oven
+Cook 887119456: Placing order 35 in the oven
+Cook 887119456: Order 35 placed in the oven
+Moto 2: Delivering orders
+Moto 2: Order 27 delivered
+Moto 2: Order 23 delivered
+Moto 2: Order 29 delivered
+Cook 3: Removing order 31 from the oven
+Cook 3: Order 31 removed from the oven
+Cook 3: Order 31 cooked
+Cook 3: Cooking order 44
+Cook 887119456: Placing order 43 in the oven
+Cook 887119456: Order 43 placed in the oven
+Cook 4: Placing order 30 in the oven
+Cook 4: Order 30 placed in the oven
+Cook 887119456: Placing order 41 in the oven
+Cook 887119456: Order 41 placed in the oven
+Cook 2: Removing order 40 from the oven
+Cook 2: Order 40 removed from the oven
+Cook 2: Order 40 cooked
+Cook 887119456: Removing order 35 from the oven
+Cook 887119456: Order 35 removed from the oven
+Cook 887119456: Order 35 cooked
+Cook 887119456: Cooking order 38
+Received order 46 from client 3.51 10.27
+Accepted new client connection
+Accepted new client connection
+Accepted new client connection
+Cook 2: Cooking order 39
+Received order 47 from client 5.91 16.92
+Moto 887118784: Delivering orders
+Received order 48 from client 4.12 16.83
+Cook 887119456: Placing order 42 in the oven
+Cook 887119456: Order 42 placed in the oven
+Received order 49 from client 2.69 8.31
+Cook 887119456: Removing order 43 from the oven
+Cook 887119456: Order 43 removed from the oven
+Cook 887119456: Order 43 cooked
+Cook 887119456: Cooking order 46
+Received order 45 from client 2.33 6.13
+Moto 887118784: Order 40 delivered
+Moto 887118784: Order 31 delivered
+Moto 887118784: Order 28 delivered
+Cook 887119456: Removing order 41 from the oven
+Cook 887119456: Order 41 removed from the oven
+Cook 887119456: Order 41 cooked
+Cook 887119456: Cooking order 49
+Cook 4: Removing order 30 from the oven
+Cook 4: Order 30 removed from the oven
+Cook 4: Order 30 cooked
+Cook 4: Cooking order 48
+Moto 1: Delivering orders
+Moto 1: Order 30 delivered
+Moto 1: Order 41 delivered
+Moto 1: Order 43 delivered
+Cook 887119456: Placing order 38 in the oven
+Cook 887119456: Order 38 placed in the oven
+Cook 3: Placing order 44 in the oven
+Cook 3: Order 44 placed in the oven
+Cook 887119456: Removing order 42 from the oven
+Cook 887119456: Order 42 removed from the oven
+Cook 887119456: Order 42 cooked
+Cook 887119456: Cooking order 45
+Cook 2: Placing order 39 in the oven
+Cook 2: Order 39 placed in the oven
+Cook 887119456: Placing order 46 in the oven
+Cook 887119456: Order 46 placed in the oven
+Cook 887119456: Removing order 38 from the oven
+Cook 887119456: Order 38 removed from the oven
+Cook 887119456: Order 38 cooked
+Cook 887119456: Cooking order 47
+Moto 887118784: Delivering orders
+Moto 887118784: Order 38 delivered
+Moto 887118784: Order 42 delivered
+Moto 887118784: Order 35 delivered
+Cook 4: Placing order 48 in the oven
+Cook 4: Order 48 placed in the oven
+Cook 3: Removing order 44 from the oven
+Cook 3: Order 44 removed from the oven
+Cook 3: Order 44 cooked
+Cook 2: Removing order 39 from the oven
+Cook 2: Order 39 removed from the oven
+Cook 2: Order 39 cooked
+Cook 2: Cooking order 37
+Cook 887119456: Placing order 49 in the oven
+Cook 887119456: Order 49 placed in the oven
+Cook 887119456: Placing order 45 in the oven
+Cook 887119456: Order 45 placed in the oven
+Cook 887119456: Removing order 46 from the oven
+Cook 887119456: Order 46 removed from the oven
+Cook 887119456: Order 46 cooked
+Cook 887119456: Cooking order 34
+Cook 3: Cooking order 36
+Cook 4: Removing order 48 from the oven
+Cook 4: Order 48 removed from the oven
+Cook 4: Order 48 cooked
+Cook 4: Cooking order 33
+Cook 887119456: Removing order 49 from the oven
+Cook 887119456: Order 49 removed from the oven
+Cook 887119456: Order 49 cooked
+Cook 887119456: Removing order 45 from the oven
+Cook 887119456: Order 45 removed from the oven
+Cook 887119456: Order 45 cooked
+Cook 887119456: Cooking order 24
+Cook 887119456: Placing order 47 in the oven
+Cook 887119456: Order 47 placed in the oven
+Moto 887118784: Delivering orders
+Moto 887118784: Order 45 delivered
+Moto 887118784: Order 39 delivered
+Moto 887118784: Order 44 delivered
+Cook 2: Placing order 37 in the oven
+Cook 2: Order 37 placed in the oven
+Cook 887119456: Cooking order 32
+Moto 2: Delivering orders
+Moto 2: Order 49 delivered
+Moto 2: Order 48 delivered
+Moto 2: Order 46 delivered
+Cook 3: Placing order 36 in the oven
+Cook 3: Order 36 placed in the oven
+Cook 887119456: Placing order 34 in the oven
+Cook 887119456: Order 34 placed in the oven
+Cook 887119456: Removing order 47 from the oven
+Cook 887119456: Order 47 removed from the oven
+Cook 887119456: Order 47 cooked
+Cook 887119456: Cooking order 19
+Cook 4: Placing order 33 in the oven
+Cook 4: Order 33 placed in the oven
+Cook 2: Removing order 37 from the oven
+Cook 2: Order 37 removed from the oven
+Cook 2: Order 37 cooked
+Cook 2: Cooking order 21
+Cook 887119456: Placing order 24 in the oven
+Cook 887119456: Order 24 placed in the oven
+Cook 3: Removing order 36 from the oven
+Cook 3: Order 36 removed from the oven
+Cook 3: Order 36 cooked
+Cook 3: Cooking order 20
+Cook 887119456: Removing order 34 from the oven
+Cook 887119456: Order 34 removed from the oven
+Cook 887119456: Order 34 cooked
+Moto 1: Delivering orders
+Moto 1: Order 34 delivered
+Moto 1: Order 36 delivered
+Moto 1: Order 37 delivered
+Cook 4: Removing order 33 from the oven
+Cook 4: Order 33 removed from the oven
+Cook 4: Order 33 cooked
+Cook 887119456: Placing order 32 in the oven
+Cook 887119456: Order 32 placed in the oven
+Cook 887119456: Removing order 24 from the oven
+Cook 887119456: Order 24 removed from the oven
+Cook 887119456: Order 24 cooked
+Cook 3: Placing order 20 in the oven
+Cook 3: Order 20 placed in the oven
+Cook 887119456: Removing order 32 from the oven
+Cook 887119456: Order 32 removed from the oven
+Cook 887119456: Order 32 cooked
+Moto 3: Delivering orders
+Moto 3: Order 32 delivered
+Moto 3: Order 24 delivered
+Moto 3: Order 33 delivered
+Cook 3: Removing order 20 from the oven
+Cook 3: Order 20 removed from the oven
+Cook 3: Order 20 cooked
+Cook 887119456: Placing order 19 in the oven
+Cook 887119456: Order 19 placed in the oven
+Cook 887119456: Removing order 19 from the oven
+Cook 887119456: Order 19 removed from the oven
+Cook 887119456: Order 19 cooked
+Moto 887118784: Delivering orders
+Cook 2: Placing order 21 in the oven
+Cook 2: Order 21 placed in the oven
+Cook 2: Removing order 21 from the oven
+Cook 2: Order 21 removed from the oven
+Cook 2: Order 21 cooked
+Cook 1: Placing order 12 in the oven
+Cook 1: Order 12 placed in the oven
+Cook 1: Removing order 12 from the oven
+Cook 1: Order 12 removed from the oven
+Cook 1: Order 12 cooked
+Moto 887118784: Order 19 delivered
+Moto 887118784: Order 20 delivered
+Moto 887118784: Order 47 delivered

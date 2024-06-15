@@ -51,6 +51,13 @@ location_t shop_location;
 
 void signal_handler(int sig) {
     if (sig == SIGINT) {
+        for (int i = 0; i < cook_task_pool.thread_count; i++) {
+            pthread_cancel(cook_task_pool.threads[i]);
+        }
+        for (int i = 0; i < delivery_task_pool.thread_count; i++) {
+            pthread_cancel(delivery_task_pool.threads[i]);
+        }
+        printf("Server is quitting...\n");
         sem_unlink("/oven_sem");
         sem_unlink("/oven_capacity_sem");
         sem_unlink("/delivery_sem");
@@ -263,8 +270,9 @@ void *handle_client(void *client_socket) {
 
     if (order.request_type == ORDER_CANCELLED) {
         // Handle order cancellation
-        char log_msg[256];
-        snprintf(log_msg, sizeof(log_msg), "Order %d: Cancelled", order.order_id);
+        snprintf(log_msg, sizeof(log_msg), "Order %d: Cancelled", order.order_id); // Debug statement
+        printf("%s\n", log_msg); // Debug statement
+        log_activity(log_msg);
         remove_order_from_queue(&order_queue, order.order_id);
         remove_order_from_queue(&oven_queue, order.order_id);
         remove_order_from_queue(&delivery_queue, order.order_id);
