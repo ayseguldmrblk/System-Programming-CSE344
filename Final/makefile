@@ -34,3 +34,4 @@ client.o: client.c common.h
 
 clean:
 	rm -f $(OBJFILES_SERVER) $(OBJFILES_CLIENT) $(TARGET_SERVER) $(TARGET_CLIENT)
+	rm -f *.log *~
