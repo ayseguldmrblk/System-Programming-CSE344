@@ -15,12 +15,14 @@
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <netinet/in.h>
+#include <errno.h>
 #include "common.h"
 #include "thread_pool.h"
 #include "delivery.h"
 #include "complex_matrix.h"
 
 #define SERVER_BACKLOG 200
+#define MAX_DELIVERY_CAPACITY 3
 
 // Delivery velocity (m/min)
 int delivery_speed;
@@ -28,11 +30,15 @@ int delivery_speed;
 sem_t *oven_sem;
 sem_t *oven_capacity_sem;
 sem_t *delivery_sem;
+sem_t *cook_id_sem;
+sem_t *moto_id_sem;
+
 pthread_mutex_t log_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t order_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t delivery_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t id_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t order_cond = PTHREAD_COND_INITIALIZER;
+pthread_cond_t delivery_cond = PTHREAD_COND_INITIALIZER;
 queue_t order_queue;
 queue_t oven_queue;
 queue_t delivery_queue;
@@ -48,6 +54,8 @@ void signal_handler(int sig) {
         sem_unlink("/oven_sem");
         sem_unlink("/oven_capacity_sem");
         sem_unlink("/delivery_sem");
+        sem_unlink("/cook_id_sem");
+        sem_unlink("/moto_id_sem");
         fclose(log_file);
         exit(0);
     }
@@ -63,17 +71,21 @@ void log_activity(const char *activity) {
 
 int get_unique_cook_id() {
     static int cook_id_counter = 1;
+    sem_wait(cook_id_sem);
     pthread_mutex_lock(&id_mutex);
     int id = cook_id_counter++;
     pthread_mutex_unlock(&id_mutex);
+    sem_post(cook_id_sem);
     return id;
 }
 
-int get_unique_delivery_id() {
-    static int delivery_id_counter = 1;
+int get_unique_moto_id() {
+    static int moto_id_counter = 1;
+    sem_wait(moto_id_sem);
     pthread_mutex_lock(&id_mutex);
-    int id = delivery_id_counter++;
+    int id = moto_id_counter++;
     pthread_mutex_unlock(&id_mutex);
+    sem_post(moto_id_sem);
     return id;
 }
 
@@ -108,7 +120,7 @@ void update_client(order_t order, const char *status) {
 void *cook_worker(void *arg) {
     int cook_id = *(int *)arg;
     thread_pool_t *pool = &cook_task_pool;
-    
+
     while (1) {
         sem_wait(&pool->task_sem);
         pthread_mutex_lock(&pool->task_mutex);
@@ -164,11 +176,11 @@ void *cook_worker(void *arg) {
             log_activity(log_msg);
             update_client(task, "Cooked");
 
-            // Add to delivery task pool
+            // Add to delivery task pool and notify delivery worker
             pthread_mutex_lock(&delivery_task_pool.task_mutex);
             delivery_task_pool.tasks[delivery_task_pool.task_index++] = task;
             pthread_mutex_unlock(&delivery_task_pool.task_mutex);
-            sem_post(&delivery_task_pool.task_sem);
+            pthread_cond_signal(&delivery_cond);
         } else {
             pthread_mutex_unlock(&pool->task_mutex);
         }
@@ -181,38 +193,56 @@ void *delivery_worker(void *arg) {
     thread_pool_t *pool = &delivery_task_pool;
 
     while (1) {
-        sem_wait(&pool->task_sem);
-        pthread_mutex_lock(&pool->task_mutex);
+        struct timespec timeout;
+        clock_gettime(CLOCK_REALTIME, &timeout);
+        timeout.tv_sec += 3;  // Timeout after 3 seconds
 
-        if (pool->task_index > 0) {
-            // Get the next task
-            order_t task = pool->tasks[--pool->task_index];
+        pthread_mutex_lock(&pool->task_mutex);
+        
+        // Wait for orders or timeout
+        int rc = pthread_cond_timedwait(&delivery_cond, &pool->task_mutex, &timeout);
+
+        // If there are enough orders or timed out
+        if (pool->task_index >= MAX_DELIVERY_CAPACITY || (rc == ETIMEDOUT && pool->task_index > 0)) {
+            int batch_size = (pool->task_index >= MAX_DELIVERY_CAPACITY) ? MAX_DELIVERY_CAPACITY : pool->task_index;
+            order_t deliveries[batch_size];
+            
+            for (int i = 0; i < batch_size; i++) {
+                deliveries[i] = pool->tasks[--pool->task_index];
+            }
             pthread_mutex_unlock(&pool->task_mutex);
 
             // Update delivery information
-            task.delivery_id = delivery_id;
+            for (int i = 0; i < batch_size; i++) {
+                deliveries[i].delivery_id = delivery_id;
+            }
 
             // Simulate delivery
             sem_wait(delivery_sem); // Lock delivery personnel
             char log_msg[256];
-            snprintf(log_msg, sizeof(log_msg), "Moto %d: Delivering order %d", delivery_id, task.order_id);
+            snprintf(log_msg, sizeof(log_msg), "Moto %d: Delivering orders", delivery_id);
             log_activity(log_msg);
-            update_client(task, "Delivering");
+            for (int i = 0; i < batch_size; i++) {
+                update_client(deliveries[i], "Delivering");
+            }
 
-            // Calculate delivery time based on customer location
-            location_t customer_location;
-            sscanf(task.client_address, "%lf %lf", &customer_location.x, &customer_location.y);
-            double delivery_time = calculate_delivery_time(shop_location, customer_location, delivery_speed);
+            // Calculate total delivery time based on customer locations
+            double total_delivery_time = 0.0;
+            for (int i = 0; i < batch_size; i++) {
+                location_t customer_location;
+                sscanf(deliveries[i].client_address, "%lf %lf", &customer_location.x, &customer_location.y);
+                total_delivery_time += calculate_delivery_time(shop_location, customer_location, delivery_speed);
+            }
 
-            sleep(delivery_time); // Simulate delivery time
+            sleep(total_delivery_time); // Simulate total delivery time
 
-            snprintf(log_msg, sizeof(log_msg), "Moto %d: Order %d delivered", delivery_id, task.order_id);
-            log_activity(log_msg);
+            for (int i = 0; i < batch_size; i++) {
+                snprintf(log_msg, sizeof(log_msg), "Moto %d: Order %d delivered", delivery_id, deliveries[i].order_id);
+                log_activity(log_msg);
+                update_client(deliveries[i], "Delivered");
+                close(deliveries[i].sock);
+            }
             sem_post(delivery_sem); // Release delivery personnel
-
-            // Update client about the delivery
-            update_client(task, "Delivered");
-            close(task.sock);
         } else {
             pthread_mutex_unlock(&pool->task_mutex);
         }
@@ -233,6 +263,8 @@ void *handle_client(void *client_socket) {
 
     if (order.request_type == ORDER_CANCELLED) {
         // Handle order cancellation
+        char log_msg[256];
+        snprintf(log_msg, sizeof(log_msg), "Order %d: Cancelled", order.order_id);
         remove_order_from_queue(&order_queue, order.order_id);
         remove_order_from_queue(&oven_queue, order.order_id);
         remove_order_from_queue(&delivery_queue, order.order_id);
@@ -333,7 +365,10 @@ int main(int argc, char const *argv[]) {
     oven_sem = sem_open("/oven_sem", O_CREAT, 0644, MAX_OVEN_TOOLS);
     oven_capacity_sem = sem_open("/oven_capacity_sem", O_CREAT, 0644, MAX_OVEN_CAPACITY);
     delivery_sem = sem_open("/delivery_sem", O_CREAT, 0644, MAX_DELIVERY_CAPACITY);
-    if (oven_sem == SEM_FAILED || delivery_sem == SEM_FAILED || oven_capacity_sem == SEM_FAILED) {
+    cook_id_sem = sem_open("/cook_id_sem", O_CREAT, 0644, cook_thread_pool_size);
+    moto_id_sem = sem_open("/moto_id_sem", O_CREAT, 0644, delivery_thread_pool_size);
+
+    if (oven_sem == SEM_FAILED || delivery_sem == SEM_FAILED || oven_capacity_sem == SEM_FAILED || cook_id_sem == SEM_FAILED || moto_id_sem == SEM_FAILED) {
         perror("sem_open");
         exit(EXIT_FAILURE);
     }
@@ -398,7 +433,7 @@ int main(int argc, char const *argv[]) {
     }
 
     for (int i = 0; i < delivery_thread_pool_size; i++) {
-        delivery_ids[i] = get_unique_delivery_id();  // Assign unique ID
+        delivery_ids[i] = get_unique_moto_id();  // Assign unique ID
         pthread_create(&delivery_task_pool.threads[i], NULL, delivery_worker, &delivery_ids[i]);
     }
 
@@ -431,6 +466,10 @@ int main(int argc, char const *argv[]) {
     sem_unlink("/oven_capacity_sem");
     sem_close(delivery_sem);
     sem_unlink("/delivery_sem");
+    sem_close(cook_id_sem);
+    sem_unlink("/cook_id_sem");
+    sem_close(moto_id_sem);
+    sem_unlink("/moto_id_sem");
     fclose(log_file);
     free(IPbuffer); // Free the duplicated string
     return 0;
