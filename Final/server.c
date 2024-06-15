@@ -50,7 +50,7 @@ thread_pool_t delivery_task_pool;
 location_t shop_location;
 
 void signal_handler(int sig) {
-    if (sig == SIGINT) {
+    if (sig == SIGINT || sig == SIGQUIT) {
         for (int i = 0; i < cook_task_pool.thread_count; i++) {
             pthread_cancel(cook_task_pool.threads[i]);
         }

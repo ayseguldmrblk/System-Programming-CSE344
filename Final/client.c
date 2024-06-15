@@ -13,7 +13,7 @@ char *server_address;
 int port;
 
 void signal_handler(int sig) {
-    if (sig == SIGINT) {
+    if (sig == SIGINT || sig == SIGQUIT) {
         // Send cancellation signal to server for each active order
         order_t order;
         order.request_type = ORDER_CANCELLED;
